@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8" />
+		<title>HTML5 Project 1</title>
+
+		<!--[if lt IE 9]>
+		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<style>
+		  body {
+				margin: 0px auto;
+				padding: 0px;
+				width: 1000px;
+				height: 800px;
+				}
+		  #myCanvas {
+				border: 1px solid #9C9898;
+				}
+		</style>
+		<script>
+			var context,
+			canvas,
+			stInt,
+			alive = true,
+			radius = 10,
+			ballsTop = [],
+			ballsRight = [], 
+			ballsLeft = [],
+			ballsBottom = [],
+			snorlax_x = 500,
+			snorlax_y = 400,
+			snorlax_h = 100,
+			snorlax_w = 100;
+			
+			function clearCanvas() {
+				context.clearRect(0,0,width,height);
+			}
+
+			// Create balls of Specific Color, Size and speeds
+			//dx and dy are speed
+			//x and y are center of pokeball
+			function Ball(x, y, radius, dx, dy, side, created) {
+				this.canvas = canvas;
+				this.context = canvas.getContext('2d');
+				this.radius = radius;
+				this.x = x;
+				this.y = y;
+				this.dx = dx;
+				this.dy = dy;
+				this.side = side;
+				this.created = created 
+			}
+
+			//creates a Pokeball
+			Ball.prototype.Create = function () {
+				this.context.beginPath();
+				this.context.fillStyle="red";
+				this.context.lineWidth="2"
+				this.context.arc(this.x,this.y,this.radius,0,Math.PI*3,true);
+				this.context.fill();
+				this.context.stroke();
+				this.context.closePath();
+		
+				this.context.beginPath();
+				this.context.fillStyle="white";
+				this.context.lineWidth="2"
+				this.context.arc(this.x,this.y,this.radius,Math.PI,0,true);
+				this.context.fill();
+				this.context.stroke();
+				this.context.closePath();
+		
+				this.context.beginPath();  
+				this.context.moveTo(this.x,this.y);  
+				this.context.lineTo(this.x-this.radius,this.y);
+				this.context.moveTo(this.x,this.y);
+				this.context.lineTo(this.x+this.radius,this.y); 
+				this.context.stroke();  	
+				this.context.closePath();  
+		 
+				this.context.beginPath();
+				this.context.fillStyle="white";
+				this.context.lineWidth="2"
+				this.context.arc(this.x,this.y,this.radius/6.25,0,Math.PI*4,true);
+				this.context.fill();
+				this.context.stroke();
+				this.context.closePath();
+				}
+
+
+			function addObjects() {
+				var w = 0;
+				var h = 0;
+				while(w<canvas.width) {
+					w += radius + 200;
+					ballsTop.push(new Ball(w,-11,10,3,3,"top",false));
+					ballsBottom.push(new Ball(w+100,canvas.height+11,10,3,3,"bottom", false));
+
+				}
+				
+				while(h<canvas.height) {
+					h += radius + 200;
+					ballsRight.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
+					ballsLeft.push(new Ball(-11,h+100,10,3,3,"left",false));
+
+				}
+				//ballsTop.push(new Ball(canvas.width/2,-11,10,3,3));
+				//ballsRight.push(new Ball(canvas.width+11,canvas.height/2,10,3,3));
+				//ballsLeft.push(new Ball(-11,canvas.height/2,10,3,3));
+				//ballsBottom.push(new Ball(canvas.width/2,canvas.height+11,10,3,3));
+			
+			}
+			function init() {
+				canvas = document.getElementById("myCanvas")
+				context = canvas.getContext('2d');
+				// Create an array to store the balls info
+				addObjects();
+				
+				
+		
+				stInt = setInterval(draw,20);
+
+			}
+			
+			
+			
+			Ball.prototype.Bounce = function ()
+			{
+				if(this.side == "top") {
+					if(this.y >= (canvas.height)) {
+						this.dy *= -1;
+						this.created = true;
+					}
+					if(this.y <= this.radius && this.created) { this.dy *= -1;}
+				} else if(this.side == "bottom") {
+					if(this.y <= this.radius) { 
+					this.dy *= -1;
+					this.created = true;
+					}
+					if(this.y >= (canvas.height) && this.created) {
+						this.dy *= -1;
+					}
+				
+				} else if(this.side == "right") {
+					if(this.x <= this.radius) { 
+					this.dx *= -1;
+					this.created = true;
+					}
+					if(this.x >= (canvas.width) && this.created) {
+						this.dx *= -1;
+					}
+				
+				} else {
+					if(this.x >= canvas.width) { 
+					this.dx *= -1;
+					this.created = true;
+					}
+					if(this.x <= (this.radius) && this.created) {
+						this.dx *= -1;
+					}
+				
+				}
+				//if (this.x >= (canvas.width+11 - this.radius) || this.x <= this.radius) this.dx *= -1;
+				//if (this.y >= (canvas.height - this.radius) || this.y <= this.radius) this.dy *= -1;
+			}
+			
+			Ball.prototype.Collide = function () {
+				var ball_xw = this.x + 10;
+				var ball_yh = this.y + 10;
+				if(this.x > (snorlax_x) && this.x < snorlax_x +100 && this.y > snorlax_y && this.xy < snorlax_y + 100) {
+					alive = false;
+				}
+				if (ball_xw < snorlax_x + snorlax_w && ball_xw > snorlax_x && this.y > snorlax_y && this.y < snorlax_y + snowlax_h) {
+					alive = false;
+				}
+				if (ball_yh > snorlax_y && ball_yh < snorlax_y + snowlax_h && this.x > snorlax_x && this.x < snorlax_x + snorlax_w) {
+					alive = false;
+				}
+				if (ball_yh > snorlax_y && ball_yh < snorlax_y + snowlax_h && ball_xw < snorlax_x + snorlax_w && ball_xw > snorlax_x) {
+					alive = false;
+				}
+				
+			}
+
+
+			//put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
+			function draw(){
+				context.clearRect(0,0, 1000,800);
+				//if(alive) {
+					context.fillStyle = "red";
+					context.fillRect( snorlax_x, snorlax_y, snorlax_w , snorlax_h );
+					for (i in ballsTop) {
+						//balls[i].x += balls[i].dx;
+						ballsTop[i].Create();
+						ballsTop[i].y += ballsTop[i].dy;
+						//ballsTop[i].x += ballsTop[i].dx;
+						
+						// Boundary checking
+						ballsTop[i].Bounce();
+						
+					}	
+					for (i in ballsRight) {
+						ballsRight[i].Create();
+						ballsRight[i].x -= ballsRight[i].dx;
+						//ballsRight[i].y += balls[i].dy;
+						//Boundary checking
+						ballsRight[i].Bounce();
+						
+					}
+					for (i in ballsLeft) {
+						ballsLeft[i].Create();
+						ballsLeft[i].x += ballsLeft[i].dx;
+						//ballsTop[i].y += balls[i].dy;
+						// Boundary checking
+						ballsLeft[i].Bounce();
+						
+					}
+					for (i in ballsBottom) {
+						//balls[i].x += balls[i].dx;
+						ballsBottom[i].Create();
+						ballsBottom[i].y -= ballsBottom[i].dy;
+						//Boundary checking
+						ballsBottom[i].Bounce();
+						
+						}
+				//} else {
+					//context.clearRect(0,0, 1000,800);
+					//window.clearInterval(stInt);
+					//
+				//}
+			}
+		</script>
+
+	</head>
+
+	<body onLoad="init();">
+		<div id="canvas">
+			<canvas id="myCanvas" width="1000" height="800"></canvas> 
+		</div>
+	</body>
+</html>
