@@ -19,8 +19,8 @@ var ballState = {
 var gameState = {
     score: 0, // Number of pokeballs eaten
     paused: false, // Game paused
-    level: 1, // Difficulty level
-    stInt: undefined, // Redraw timer interval, to be instantiated later.
+    level: 2, // Difficulty level
+    stInt: undefined // Redraw timer interval, to be instantiated later.
 }
 
 var snorlax = {
@@ -33,6 +33,7 @@ var snorlax = {
     awakeMeterDelta: 1, // Amount awake energy changes per tick
     health: 100, // Current HP
     radius: 50, // Radius of snorlax sprite
+	hit: false
 }
 
 var keyControls = {
@@ -150,7 +151,12 @@ function drawSnorlaxSprite(){
     function circle(ctx, cx, cy, radius) {
         ctx.arc(cx, cy, radius, 0, 2*Math.PI, true);
     }
-    ctx.fillStyle = faceColor;
+	
+	if(!snorlax.hit)
+		ctx.fillStyle = faceColor;	
+	else
+		ctx.fillStyle = "rgb(186, 7, 16)";
+    
     ctx.beginPath();
     circle(ctx, snorlaxX, snorlaxY, snorlaxR);
     ctx.fill();
@@ -172,7 +178,7 @@ function drawSnorlaxSprite(){
         ctx.fillRect(snorlaxX - 15, snorlaxY + 10, 30, 5);
     }
     //ears
-    ctx.fillStyle = earColor;
+	ctx.fillStyle = earColor;
     ctx.beginPath();
     ctx.moveTo(snorlaxX - 43, snorlaxY - 25);
     ctx.lineTo(snorlaxX - 38, snorlaxY - 25 - 40);
@@ -205,7 +211,8 @@ function drawSnorlaxSprite(){
     }
  
     //Face surrounding.
-    ctx.fillStyle = earColor;
+	ctx.fillStyle = earColor;
+			
     ctx.beginPath();
     ctx.moveTo(snorlaxX + 25, snorlaxY + 43);
     ctx.arc(snorlaxX , snorlaxY , 45, 0.8, -1.05, true);
@@ -269,7 +276,14 @@ function drawBalls(){
         }
         // Boundary checking
         ballState.top[i].Bounce();
-        ballState.top[i].Collide();
+        if(ballState.top[i].Collide()) {
+				console.log(snorlax.hit);
+			if(i === 0)
+				ballState.top.splice(0,1);
+			else 
+				ballState.top.splice(i,1);
+				setTimeout(function() {snorlax.hit = false;}, 1000);
+		};
 
     }
     for (i in ballState.right) {
@@ -280,7 +294,13 @@ function drawBalls(){
         }
         //Boundary checking
         ballState.right[i].Bounce();
-        ballState.right[i].Collide();
+        if(ballState.right[i].Collide()) {
+			if(i === 0)
+				ballState.right.splice(0,1);
+			else 
+				ballState.right.splice(i,1);
+				setTimeout(function() {snorlax.hit = false;}, 1000);
+		};
 
     }
     for (i in ballState.left) {
@@ -291,7 +311,13 @@ function drawBalls(){
         }
         // Boundary checking
         ballState.left[i].Bounce();
-        ballState.left[i].Collide();
+       if(ballState.left[i].Collide()) {
+			if(i === 0)
+				ballState.left.splice(0,1);
+			else 
+				ballState.left.splice(i,1);
+				setTimeout(function() {snorlax.hit = false;}, 1000);
+		};
 
     }
     for (i in ballState.bottom) {
@@ -302,8 +328,13 @@ function drawBalls(){
         }
         //Boundary checking
         ballState.bottom[i].Bounce();
-        ballState.bottom[i].Collide();
-
+        if(ballState.bottom[i].Collide()) {
+			if(i === 0)
+				ballState.bottom.splice(0,1);
+			else 
+				ballState.bottom.splice(i,1);
+				setTimeout(function() {snorlax.hit = false;}, 1000);
+		};
     }
 }
 
@@ -402,8 +433,8 @@ function generateBalls() {
 
     while(h<canvas.height) {
         h += ballState.radius + 200;
-        //ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
-        //ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+        ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
+        ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
     }
     
     //ballState.top.push(new Ball(canvas.width/2,-11,10,3,3));
@@ -481,12 +512,36 @@ Ball.prototype.Collide = function () {
     // TODO(jocelyn): Make sure the mouth detection happens before and overrides the body detection.
     var dis = Math.sqrt(Math.pow((this.x - snorlax.x), 2) + Math.pow((this.y - snorlax.y), 2));
     var rad = this.radius + snorlax.radius;
-
-    if(!snorlax.mouthOpen) {
-        if(dis <= rad) {
+	var snorlaxMouthL = snorlax.x-15;
+	var snorlaxMouthR = snorlaxMouthL + 30;
+	var snorlaxMouthT = snorlax.y + 10;
+	var snorlaxMouthB = snorlaxMouthT +20;
+	if(snorlax.mouthOpen) {
+		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
+			gameState.score += 10;
+			return true;
+		}
+		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
+			gameState.score += 10;
+			return true;
+		}
+		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
+			gameState.score += 10;
+			return true;
+		}
+		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
+			gameState.score += 10;
+			return true;
+		}
+	} else {
+		if(dis <= rad) {
             snorlax.health -= 25;
+			snorlax.hit = true;
+			console.log("Collided: " + snorlax.hit);
+			return true;
         }
-    }
+	}
+
 }
 
 function clearCanvas() {
