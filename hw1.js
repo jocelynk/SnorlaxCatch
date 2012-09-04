@@ -316,6 +316,83 @@ function drawHud() {
     ctx.fillText("PP", 500, 775);
 }
 
+function drawGrass(x, y) {
+	ctx.fillStyle = "green";
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	ctx.lineTo(x-25, y);
+	ctx.arc(x-25-45, y , 45, 0, -0.8, true);
+	ctx.lineTo(x-10, y-15);
+	ctx.lineTo(x, y-40);
+	ctx.lineTo(x+10, y-15);
+	ctx.arc(x+25+45, y , 45, Math.PI+0.8, Math.PI, true);
+	ctx.fill();
+}
+
+function drawFlower(x, y, color) {
+	ctx.beginPath();
+	ctx.fillStyle = "yellow";
+	ctx.arc(x, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.fillStyle = color;
+	ctx.beginPath();
+	ctx.arc(x+10, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-10, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x, y+10, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x, y-10, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x+7, y-7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-7, y-7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.arc(x+7, y+7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-7, y+7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+
+	ctx.strokeStyle = "green";
+	ctx.lineWidth=6;
+	ctx.beginPath();
+	ctx.moveTo(x, y+15);
+	ctx.lineTo(x,y+25);
+	ctx.lineTo(x+2, y+26);
+	ctx.lineTo(x-2, y+26);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+
+function drawBackground() {
+	ctx.fillStyle= "lightgreen";
+	ctx.fillRect(0,0,canvas.width, canvas.height);
+	drawGrass(50,50);
+	drawGrass(556, 600);
+	drawGrass(311, 411);
+	drawGrass(637, 200);
+	drawGrass(392, 650);
+	drawGrass(150, 300);
+	drawGrass(150, 620);
+	drawGrass(400, 110);
+	drawGrass(500, 320);
+	drawGrass(800, 90);
+	drawGrass(750, 430);
+	drawGrass(850, 570);
+	drawFlower(110, 120, "red");
+	drawFlower(410, 150, "purple");
+	drawFlower(240, 560, "gold");
+	drawFlower(710, 320, "blue");
+	drawFlower(850, 480, "pink");
+}
+
 //splice after hit wall, add new ball
 //put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
 function drawBalls(){
@@ -618,6 +695,7 @@ function clearCanvas() {
 function redraw() {
     if(!gameState.paused) {
         clearCanvas();
+		drawBackground();
         drawSnorlax(snorlax);
         drawHud();
         drawBalls();
