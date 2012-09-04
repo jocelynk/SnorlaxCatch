@@ -3,7 +3,17 @@
  */
 var canvas = document.getElementById("myCanvas"),
     ctx = canvas.getContext('2d');
-   
+
+var gameSettings = {
+    pointsPerPokeballEaten: 10,
+    damagePerPokeballHit: 25,
+    maxHealth: 100,
+    maxAwakeMeter: 100,
+    awakeMeterRechargeDelta: 1,
+    awakeMeterDrainDelta: -1,
+    snorlaxMoveSpeed: 5, // must be positive
+}
+    
 /**
  * Global objects
  */
@@ -31,9 +41,9 @@ var snorlax = {
     rotation: 0, // Radians rotated
     zState: 0, // Where the Z for sleep appears (up/down/etc)
     mouthOpen: false, // Mouth is open for eating pokeballs
-    awakeMeter: 100, // Amount of awake energy for keeping mouth open
-    awakeMeterDelta: 1, // Amount awake energy changes per tick
-    health: 100, // Current HP
+    awakeMeter: gameSettings.maxAwakeMeter, // Amount of awake energy for keeping mouth open
+    awakeMeterDelta: gameSettings.awakeMeterRechargeDelta, // Amount awake energy changes per tick
+    health: gameSettings.maxHealth, // Current HP
     radius: 50, // Radius of snorlax sprite
 	hit: false
 }
@@ -116,16 +126,16 @@ function moveSnorlax(direction) {
     
     switch(direction) {
         case "up":
-            snorlax.dy = -5;
+            snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
             break;
         case "down":
-            snorlax.dy = 5;
+            snorlax.dy = gameSettings.snorlaxMoveSpeed;
             break;
         case "left":
-            snorlax.dx = -5;
+            snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
             break;
         case "right":
-            snorlax.dx = 5;
+            snorlax.dx = gameSettings.snorlaxMoveSpeed;
             break;
     }
 }
@@ -559,30 +569,46 @@ Ball.prototype.Collide = function () {
 	var snorlaxMouthB = snorlaxMouthT +20;
 	if(snorlax.mouthOpen) {
 		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 	} else {
 		if(dis <= rad) {
-            snorlax.health -= 25;
+            snorlax.health -= gameSettings.damagePerPokeballHit;
+            if(snorlax.health < 0) {
+                snorlax.health = 0;
+            }
 			snorlax.hit = true;
 			console.log("Collided: " + snorlax.hit);
 			return true;
         }
 	}
 
+}
+
+//TODO(tanay): Make this better
+function checkLose() {
+    if(snorlax.health <= 0) {
+        gameState.paused = true;
+        clearCanvas();
+        ctx.fillText("Game Over, you've been caught!", 400, 400);
+        ctx.fillStyle = "black";
+        ctx.font = "25px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over, you've been caught!", 450, 450);
+    }
 }
 
 function clearCanvas() {
@@ -595,6 +621,7 @@ function redraw() {
         drawSnorlax(snorlax);
         drawHud();
         drawBalls();
+        checkLose();
     }
 }
 
