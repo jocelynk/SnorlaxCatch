@@ -19,7 +19,7 @@ var ballState = {
 var gameState = {
     score: 0, // Number of pokeballs eaten
     paused: false, // Game paused
-    level: 2, // Difficulty level
+    level: 1, // Difficulty level
     stInt: undefined // Redraw timer interval, to be instantiated later.
 }
 
@@ -265,6 +265,18 @@ function drawHud() {
     ctx.fillText("PP", 500, 775);
 }
 
+function gameStateLevel() {
+	//later check if snorlax is alive
+	//console.log(ballState.top.length);
+	if (ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
+		gameState.level++;
+		console.log(gameState.level);
+		return true;
+	} else {
+		return false;
+	}
+}
+
 //splice after hit wall, add new ball
 //put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
 function drawBalls(){
@@ -277,11 +289,11 @@ function drawBalls(){
         // Boundary checking
         ballState.top[i].Bounce();
         if(ballState.top[i].Collide()) {
-				console.log(snorlax.hit);
 			if(i === 0)
 				ballState.top.splice(0,1);
 			else 
 				ballState.top.splice(i,1);
+			console.log(ballState.top.length);
 				setTimeout(function() {snorlax.hit = false;}, 1000);
 		};
 
@@ -425,14 +437,15 @@ function generateBalls() {
          random_y = 3;
     }
     
-    while(w<canvas.width) {
-        w += ballState.radius + 200;
+    while(w<800) {
+        w += ballState.radius + 150;
         ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
-        ballState.bottom.push(new Ball(w + 100, canvas.height + 11, 10, random_x, random_y, "bottom", false));
+		console.log("length " +ballState.top.length);
+        //ballState.bottom.push(new Ball(w + 100, canvas.height + 11, 10, random_x, random_y, "bottom", false));
     }
 
-    while(h<canvas.height) {
-        h += ballState.radius + 200;
+    while(h<600) {
+        h += ballState.radius + 150;
         ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
         ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
     }
@@ -537,7 +550,6 @@ Ball.prototype.Collide = function () {
 		if(dis <= rad) {
             snorlax.health -= 25;
 			snorlax.hit = true;
-			console.log("Collided: " + snorlax.hit);
 			return true;
         }
 	}
@@ -553,7 +565,12 @@ function redraw() {
         clearCanvas();
         drawSnorlax(snorlax);
         drawHud();
+		if(gameStateLevel()) {
+			console.log("balls generated");
+			generateBalls();
+		}
         drawBalls();
+		
     }
 }
 
