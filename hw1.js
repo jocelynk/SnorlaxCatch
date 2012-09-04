@@ -3,7 +3,17 @@
  */
 var canvas = document.getElementById("myCanvas"),
     ctx = canvas.getContext('2d');
-   
+
+var gameSettings = {
+    pointsPerPokeballEaten: 10,
+    damagePerPokeballHit: 25,
+    maxHealth: 100,
+    maxAwakeMeter: 100,
+    awakeMeterRechargeDelta: 1,
+    awakeMeterDrainDelta: -1,
+    snorlaxMoveSpeed: 5, // must be positive
+}
+    
 /**
  * Global objects
  */
@@ -26,12 +36,14 @@ var gameState = {
 var snorlax = {
     x: canvas.width / 2, // x position of center of snorlax
     y: canvas.height / 2, // y position of center of snorlax
+    dx: 0, // x motion of snorlax
+    dy: 0, // y motion of snorlax
     rotation: 0, // Radians rotated
     zState: 0, // Where the Z for sleep appears (up/down/etc)
     mouthOpen: false, // Mouth is open for eating pokeballs
-    awakeMeter: 100, // Amount of awake energy for keeping mouth open
-    awakeMeterDelta: 1, // Amount awake energy changes per tick
-    health: 100, // Current HP
+    awakeMeter: gameSettings.maxAwakeMeter, // Amount of awake energy for keeping mouth open
+    awakeMeterDelta: gameSettings.awakeMeterRechargeDelta, // Amount awake energy changes per tick
+    health: gameSettings.maxHealth, // Current HP
     radius: 50, // Radius of snorlax sprite
 	hit: false
 }
@@ -48,7 +60,11 @@ var keyControls = {
  * Event handlers
  */
 function onKeyDown(event) {
-    handleKeyInput(keyControls[event.keyCode]);
+    handleKeyDown(keyControls[event.keyCode]);
+}
+
+function onKeyUp(event) {
+    handleKeyUp(keyControls[event.keyCode]);
 }
 
 function onMouseMove(event) {
@@ -70,18 +86,26 @@ function onMouseUp(event) {
 /**
  * Event handler helpers
  */
-function handleKeyInput(input) {
+function handleKeyDown(input) {
     if(input === undefined) {
         return;
     }
     switch(input.type) {
         case "move":
-            moveSnorlax(input.value);      
+            moveSnorlax(input.value);
             break;
         case "game":
             handleGameInput(input.value);
             break;
     }
+
+}
+
+function handleKeyUp(input) {
+    if(input === undefined || input.type !== "move") {
+        return;
+    }
+    stopMoveSnorlax(input.value);
 }
 
 function handleGameInput(input) {
@@ -97,22 +121,43 @@ function handleGameInput(input) {
  */
 function moveSnorlax(direction) {
     if(gameState.paused) {
-    return;
+        return;
     }
     
     switch(direction) {
-    case "up":
-        snorlax.y -= 5;
-        break;
-    case "down":
-        snorlax.y += 5;
-        break;
-    case "left":
-        snorlax.x -= 5;
-        break;
-    case "right":
-        snorlax.x += 5;
-        break;
+        case "up":
+            snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
+            break;
+        case "down":
+            snorlax.dy = gameSettings.snorlaxMoveSpeed;
+            break;
+        case "left":
+            snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
+            break;
+        case "right":
+            snorlax.dx = gameSettings.snorlaxMoveSpeed;
+            break;
+    }
+}
+
+function stopMoveSnorlax(direction) {
+    if(gameState.paused) {
+        return;
+    }
+    
+    switch(direction) {
+        case "up":
+            snorlax.dy = 0;
+            break;
+        case "down":
+            snorlax.dy = 0;
+            break;
+        case "left":
+            snorlax.dx = 0;
+            break;
+        case "right":
+            snorlax.dx = 0;
+            break;
     }
 }
 
@@ -120,8 +165,14 @@ function rotateSnorlax(angle) {
     snorlax.rotation = angle;    
 }
 
+function updateSnorlaxPosition() {
+    snorlax.x += snorlax.dx;
+    snorlax.y += snorlax.dy;
+}
+
 function drawSnorlax(snorlax) {
     ctx.save();
+    updateSnorlaxPosition();
     ctx.translate(snorlax.x, snorlax.y);
     ctx.rotate(snorlax.rotation);
     drawSnorlaxSprite();
@@ -275,6 +326,83 @@ function gameStateLevel() {
 	} else {
 		return false;
 	}
+}
+	
+function drawGrass(x, y) {
+	ctx.fillStyle = "green";
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	ctx.lineTo(x-25, y);
+	ctx.arc(x-25-45, y , 45, 0, -0.8, true);
+	ctx.lineTo(x-10, y-15);
+	ctx.lineTo(x, y-40);
+	ctx.lineTo(x+10, y-15);
+	ctx.arc(x+25+45, y , 45, Math.PI+0.8, Math.PI, true);
+	ctx.fill();
+}
+
+function drawFlower(x, y, color) {
+	ctx.beginPath();
+	ctx.fillStyle = "yellow";
+	ctx.arc(x, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.fillStyle = color;
+	ctx.beginPath();
+	ctx.arc(x+10, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-10, y, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x, y+10, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x, y-10, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x+7, y-7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-7, y-7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.arc(x+7, y+7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+	ctx.beginPath();
+	ctx.arc(x-7, y+7, 5, 0, 2*Math.PI, true);
+	ctx.fill();
+
+	ctx.strokeStyle = "green";
+	ctx.lineWidth=6;
+	ctx.beginPath();
+	ctx.moveTo(x, y+15);
+	ctx.lineTo(x,y+25);
+	ctx.lineTo(x+2, y+26);
+	ctx.lineTo(x-2, y+26);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+
+function drawBackground() {
+	ctx.fillStyle= "lightgreen";
+	ctx.fillRect(0,0,canvas.width, canvas.height);
+	drawGrass(50,50);
+	drawGrass(556, 600);
+	drawGrass(311, 411);
+	drawGrass(637, 200);
+	drawGrass(392, 650);
+	drawGrass(150, 300);
+	drawGrass(150, 620);
+	drawGrass(400, 110);
+	drawGrass(500, 320);
+	drawGrass(800, 90);
+	drawGrass(750, 430);
+	drawGrass(850, 570);
+	drawFlower(110, 120, "red");
+	drawFlower(410, 150, "purple");
+	drawFlower(240, 560, "gold");
+	drawFlower(710, 320, "blue");
+	drawFlower(850, 480, "pink");
 }
 
 //splice after hit wall, add new ball
@@ -440,8 +568,7 @@ function generateBalls() {
     while(w<800) {
         w += ballState.radius + 150;
         ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
-		console.log("length " +ballState.top.length);
-        //ballState.bottom.push(new Ball(w + 100, canvas.height + 11, 10, random_x, random_y, "bottom", false));
+        ballState.bottom.push(new Ball(w + 100, canvas.height + 11, 10, random_x, random_y, "bottom", false));
     }
 
     while(h<600) {
@@ -531,29 +658,45 @@ Ball.prototype.Collide = function () {
 	var snorlaxMouthB = snorlaxMouthT +20;
 	if(snorlax.mouthOpen) {
 		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += 10;
+			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
 	} else {
 		if(dis <= rad) {
-            snorlax.health -= 25;
+            snorlax.health -= gameSettings.damagePerPokeballHit;
+            if(snorlax.health < 0) {
+                snorlax.health = 0;
+            }
 			snorlax.hit = true;
 			return true;
         }
 	}
 
+}
+
+//TODO(tanay): Make this better
+function checkLose() {
+    if(snorlax.health <= 0) {
+        gameState.paused = true;
+        clearCanvas();
+        ctx.fillText("Game Over, you've been caught!", 400, 400);
+        ctx.fillStyle = "black";
+        ctx.font = "25px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over, you've been caught!", 450, 450);
+    }
 }
 
 function clearCanvas() {
@@ -563,6 +706,7 @@ function clearCanvas() {
 function redraw() {
     if(!gameState.paused) {
         clearCanvas();
+		drawBackground();
         drawSnorlax(snorlax);
         drawHud();
 		if(gameStateLevel()) {
@@ -570,12 +714,13 @@ function redraw() {
 			generateBalls();
 		}
         drawBalls();
-		
+        checkLose();
     }
 }
 
 function addEventListeners() {
     canvas.addEventListener('keydown', onKeyDown, false);
+    canvas.addEventListener('keyup', onKeyUp, false);
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
