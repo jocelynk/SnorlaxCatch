@@ -19,13 +19,15 @@ var ballState = {
 var gameState = {
     score: 0, // Number of pokeballs eaten
     paused: false, // Game paused
-    level: 2, // Difficulty level
+    level: 1, // Difficulty level
     stInt: undefined // Redraw timer interval, to be instantiated later.
 }
 
 var snorlax = {
     x: canvas.width / 2, // x position of center of snorlax
     y: canvas.height / 2, // y position of center of snorlax
+    dx: 0, // x motion of snorlax
+    dy: 0, // y motion of snorlax
     rotation: 0, // Radians rotated
     zState: 0, // Where the Z for sleep appears (up/down/etc)
     mouthOpen: false, // Mouth is open for eating pokeballs
@@ -48,7 +50,11 @@ var keyControls = {
  * Event handlers
  */
 function onKeyDown(event) {
-    handleKeyInput(keyControls[event.keyCode]);
+    handleKeyDown(keyControls[event.keyCode]);
+}
+
+function onKeyUp(event) {
+    handleKeyUp(keyControls[event.keyCode]);
 }
 
 function onMouseMove(event) {
@@ -70,18 +76,26 @@ function onMouseUp(event) {
 /**
  * Event handler helpers
  */
-function handleKeyInput(input) {
+function handleKeyDown(input) {
     if(input === undefined) {
         return;
     }
     switch(input.type) {
         case "move":
-            moveSnorlax(input.value);      
+            moveSnorlax(input.value);
             break;
         case "game":
             handleGameInput(input.value);
             break;
     }
+
+}
+
+function handleKeyUp(input) {
+    if(input === undefined || input.type !== "move") {
+        return;
+    }
+    stopMoveSnorlax(input.value);
 }
 
 function handleGameInput(input) {
@@ -97,22 +111,43 @@ function handleGameInput(input) {
  */
 function moveSnorlax(direction) {
     if(gameState.paused) {
-    return;
+        return;
     }
     
     switch(direction) {
-    case "up":
-        snorlax.y -= 5;
-        break;
-    case "down":
-        snorlax.y += 5;
-        break;
-    case "left":
-        snorlax.x -= 5;
-        break;
-    case "right":
-        snorlax.x += 5;
-        break;
+        case "up":
+            snorlax.dy = -5;
+            break;
+        case "down":
+            snorlax.dy = 5;
+            break;
+        case "left":
+            snorlax.dx = -5;
+            break;
+        case "right":
+            snorlax.dx = 5;
+            break;
+    }
+}
+
+function stopMoveSnorlax(direction) {
+    if(gameState.paused) {
+        return;
+    }
+    
+    switch(direction) {
+        case "up":
+            snorlax.dy = 0;
+            break;
+        case "down":
+            snorlax.dy = 0;
+            break;
+        case "left":
+            snorlax.dx = 0;
+            break;
+        case "right":
+            snorlax.dx = 0;
+            break;
     }
 }
 
@@ -120,8 +155,14 @@ function rotateSnorlax(angle) {
     snorlax.rotation = angle;    
 }
 
+function updateSnorlaxPosition() {
+    snorlax.x += snorlax.dx;
+    snorlax.y += snorlax.dy;
+}
+
 function drawSnorlax(snorlax) {
     ctx.save();
+    updateSnorlaxPosition();
     ctx.translate(snorlax.x, snorlax.y);
     ctx.rotate(snorlax.rotation);
     drawSnorlaxSprite();
@@ -559,6 +600,7 @@ function redraw() {
 
 function addEventListeners() {
     canvas.addEventListener('keydown', onKeyDown, false);
+    canvas.addEventListener('keyup', onKeyUp, false);
     canvas.addEventListener('mousemove', onMouseMove, false);
     canvas.addEventListener('mousedown', onMouseDown, false);
     canvas.addEventListener('mouseup', onMouseUp, false);
