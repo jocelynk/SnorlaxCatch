@@ -605,16 +605,16 @@ function generateBalls() {
 
 		switch(gameState.level) {
 			case 1:
-				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 2:
-				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 3:
-				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 4:
-				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 		}
       
@@ -626,14 +626,14 @@ function generateBalls() {
 			case 1:
 				break;
 			case 2:
-				//ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
-				//ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+				ballState.right.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				ballState.left.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
 				break;
 			case 3:
 				break;
 			case 4:
-				ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
-				ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+				ballState.right.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				ballState.left.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
 				break;
 		}
     }
@@ -787,8 +787,7 @@ function checkWin() {
 	if(gameState.level == 4 && ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
 		gameState.paused = true;
 		clearCanvas();
-		ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
-        ctx.fillStyle = "black";
+		ctx.fillStyle = "black";
         ctx.font = "25px Arial";
         ctx.textAlign = "center";
 		ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
@@ -808,7 +807,13 @@ function redraw() {
         drawHud();
         drawSnorlax(snorlax);
         if(gameStateLevel()) {
-            console.log("balls generated");
+			//ctx.fillStyle = 'red';
+			//ctx.globalAlpha=0.2;
+			//ctx.fillRect(0,0,canvas.width,canvas.height);
+			//ctx.fillStyle = "black";
+        //ctx.font = "25px Arial";
+       // ctx.textAlign = "center";
+		//ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
             generateBalls();
         }
         drawBalls();
