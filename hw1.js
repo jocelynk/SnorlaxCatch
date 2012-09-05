@@ -45,7 +45,7 @@ var snorlax = {
     awakeMeterDelta: gameSettings.awakeMeterRechargeDelta, // Amount awake energy changes per tick
     health: gameSettings.maxHealth, // Current HP
     radius: 50, // Radius of snorlax sprite
-	hit: false
+    hit: false
 }
 
 var keyControls = {
@@ -202,11 +202,11 @@ function drawSnorlaxSprite(){
     function circle(ctx, cx, cy, radius) {
         ctx.arc(cx, cy, radius, 0, 2*Math.PI, true);
     }
-	
-	if(!snorlax.hit)
-		ctx.fillStyle = faceColor;	
-	else
-		ctx.fillStyle = "rgb(186, 7, 16)";
+    
+    if(!snorlax.hit)
+        ctx.fillStyle = faceColor;    
+    else
+        ctx.fillStyle = "rgb(186, 7, 16)";
     
     ctx.beginPath();
     circle(ctx, snorlaxX, snorlaxY, snorlaxR);
@@ -229,7 +229,7 @@ function drawSnorlaxSprite(){
         ctx.fillRect(snorlaxX - 15, snorlaxY + 10, 30, 5);
     }
     //ears
-	ctx.fillStyle = earColor;
+    ctx.fillStyle = earColor;
     ctx.beginPath();
     ctx.moveTo(snorlaxX - 43, snorlaxY - 25);
     ctx.lineTo(snorlaxX - 38, snorlaxY - 25 - 40);
@@ -262,8 +262,8 @@ function drawSnorlaxSprite(){
     }
  
     //Face surrounding.
-	ctx.fillStyle = earColor;
-			
+    ctx.fillStyle = earColor;
+            
     ctx.beginPath();
     ctx.moveTo(snorlaxX + 25, snorlaxY + 43);
     ctx.arc(snorlaxX , snorlaxY , 45, 0.8, -1.05, true);
@@ -317,92 +317,92 @@ function drawHud() {
 }
 
 function gameStateLevel() {
-	//later check if snorlax is alive
-	//console.log(ballState.top.length);
-	if (ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
-		gameState.level++;
-		console.log(gameState.level);
-		return true;
-	} else {
-		return false;
-	}
+    //later check if snorlax is alive
+    //console.log(ballState.top.length);
+    if (ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
+        gameState.level++;
+        console.log(gameState.level);
+        return true;
+    } else {
+        return false;
+    }
 }
-	
+    
 function drawGrass(x, y) {
-	ctx.fillStyle = "green";
-	ctx.beginPath();
-	ctx.moveTo(x, y);
-	ctx.lineTo(x-25, y);
-	ctx.arc(x-25-45, y , 45, 0, -0.8, true);
-	ctx.lineTo(x-10, y-15);
-	ctx.lineTo(x, y-40);
-	ctx.lineTo(x+10, y-15);
-	ctx.arc(x+25+45, y , 45, Math.PI+0.8, Math.PI, true);
-	ctx.fill();
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x-25, y);
+    ctx.arc(x-25-45, y , 45, 0, -0.8, true);
+    ctx.lineTo(x-10, y-15);
+    ctx.lineTo(x, y-40);
+    ctx.lineTo(x+10, y-15);
+    ctx.arc(x+25+45, y , 45, Math.PI+0.8, Math.PI, true);
+    ctx.fill();
 }
 
 function drawFlower(x, y, color) {
-	ctx.beginPath();
-	ctx.fillStyle = "yellow";
-	ctx.arc(x, y, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.fillStyle = color;
-	ctx.beginPath();
-	ctx.arc(x+10, y, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x-10, y, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x, y+10, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x, y-10, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x+7, y-7, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x-7, y-7, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.arc(x+7, y+7, 5, 0, 2*Math.PI, true);
-	ctx.fill();
-	ctx.beginPath();
-	ctx.arc(x-7, y+7, 5, 0, 2*Math.PI, true);
-	ctx.fill();
+    ctx.beginPath();
+    ctx.fillStyle = "yellow";
+    ctx.arc(x, y, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x+10, y, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x-10, y, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y+10, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y-10, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x+7, y-7, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x-7, y-7, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.arc(x+7, y+7, 5, 0, 2*Math.PI, true);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x-7, y+7, 5, 0, 2*Math.PI, true);
+    ctx.fill();
 
-	ctx.strokeStyle = "green";
-	ctx.lineWidth=6;
-	ctx.beginPath();
-	ctx.moveTo(x, y+15);
-	ctx.lineTo(x,y+25);
-	ctx.lineTo(x+2, y+26);
-	ctx.lineTo(x-2, y+26);
-	ctx.closePath();
-	ctx.stroke();
+    ctx.strokeStyle = "green";
+    ctx.lineWidth=6;
+    ctx.beginPath();
+    ctx.moveTo(x, y+15);
+    ctx.lineTo(x,y+25);
+    ctx.lineTo(x+2, y+26);
+    ctx.lineTo(x-2, y+26);
+    ctx.closePath();
+    ctx.stroke();
 }
 
 
 function drawBackground() {
-	ctx.fillStyle= "lightgreen";
-	ctx.fillRect(0,0,canvas.width, canvas.height);
-	drawGrass(50,50);
-	drawGrass(556, 600);
-	drawGrass(311, 411);
-	drawGrass(637, 200);
-	drawGrass(392, 650);
-	drawGrass(150, 300);
-	drawGrass(150, 620);
-	drawGrass(400, 110);
-	drawGrass(500, 320);
-	drawGrass(800, 90);
-	drawGrass(750, 430);
-	drawGrass(850, 570);
-	drawFlower(110, 120, "red");
-	drawFlower(410, 150, "purple");
-	drawFlower(240, 560, "gold");
-	drawFlower(710, 320, "blue");
-	drawFlower(850, 480, "pink");
+    ctx.fillStyle= "lightgreen";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
+    drawGrass(50,50);
+    drawGrass(556, 600);
+    drawGrass(311, 411);
+    drawGrass(637, 200);
+    drawGrass(392, 650);
+    drawGrass(150, 300);
+    drawGrass(150, 620);
+    drawGrass(400, 110);
+    drawGrass(500, 320);
+    drawGrass(800, 90);
+    drawGrass(750, 430);
+    drawGrass(850, 570);
+    drawFlower(110, 120, "red");
+    drawFlower(410, 150, "purple");
+    drawFlower(240, 560, "gold");
+    drawFlower(710, 320, "blue");
+    drawFlower(850, 480, "pink");
 }
 
 //splice after hit wall, add new ball
@@ -417,13 +417,13 @@ function drawBalls(){
         // Boundary checking
         ballState.top[i].Bounce();
         if(ballState.top[i].Collide()) {
-			if(i === 0)
-				ballState.top.splice(0,1);
-			else 
-				ballState.top.splice(i,1);
-			console.log(ballState.top.length);
-				setTimeout(function() {snorlax.hit = false;}, 1000);
-		};
+            if(i === 0)
+                ballState.top.splice(0,1);
+            else 
+                ballState.top.splice(i,1);
+            console.log(ballState.top.length);
+                setTimeout(function() {snorlax.hit = false;}, 1000);
+        };
 
     }
     for (i in ballState.right) {
@@ -435,12 +435,12 @@ function drawBalls(){
         //Boundary checking
         ballState.right[i].Bounce();
         if(ballState.right[i].Collide()) {
-			if(i === 0)
-				ballState.right.splice(0,1);
-			else 
-				ballState.right.splice(i,1);
-				setTimeout(function() {snorlax.hit = false;}, 1000);
-		};
+            if(i === 0)
+                ballState.right.splice(0,1);
+            else 
+                ballState.right.splice(i,1);
+                setTimeout(function() {snorlax.hit = false;}, 1000);
+        };
 
     }
     for (i in ballState.left) {
@@ -452,12 +452,12 @@ function drawBalls(){
         // Boundary checking
         ballState.left[i].Bounce();
        if(ballState.left[i].Collide()) {
-			if(i === 0)
-				ballState.left.splice(0,1);
-			else 
-				ballState.left.splice(i,1);
-				setTimeout(function() {snorlax.hit = false;}, 1000);
-		};
+            if(i === 0)
+                ballState.left.splice(0,1);
+            else 
+                ballState.left.splice(i,1);
+                setTimeout(function() {snorlax.hit = false;}, 1000);
+        };
 
     }
     for (i in ballState.bottom) {
@@ -469,12 +469,12 @@ function drawBalls(){
         //Boundary checking
         ballState.bottom[i].Bounce();
         if(ballState.bottom[i].Collide()) {
-			if(i === 0)
-				ballState.bottom.splice(0,1);
-			else 
-				ballState.bottom.splice(i,1);
-				setTimeout(function() {snorlax.hit = false;}, 1000);
-		};
+            if(i === 0)
+                ballState.bottom.splice(0,1);
+            else 
+                ballState.bottom.splice(i,1);
+                setTimeout(function() {snorlax.hit = false;}, 1000);
+        };
     }
 }
 
@@ -487,10 +487,10 @@ function initSleepToggler() {
 function initAwakeMeter() {
     snorlax.awakeMeterInterval = setInterval(function() {
         if(snorlax.mouthOpen) {
-            snorlax.awakeMeterDelta = -1;
+            snorlax.awakeMeterDelta = gameSettings.awakeMeterDrainDelta;
         }
         else {
-            snorlax.awakeMeterDelta = 1;
+            snorlax.awakeMeterDelta = gameSettings.awakeMeterRechargeDelta;
         }
 
         snorlax.awakeMeter += snorlax.awakeMeterDelta;
@@ -648,42 +648,66 @@ Ball.prototype.Bounce = function () {
     }
 }
 
+
+
 Ball.prototype.Collide = function () {
     // TODO(jocelyn): Make sure the mouth detection happens before and overrides the body detection.
     var dis = Math.sqrt(Math.pow((this.x - snorlax.x), 2) + Math.pow((this.y - snorlax.y), 2));
     var rad = this.radius + snorlax.radius;
-	var snorlaxMouthL = snorlax.x-15;
-	var snorlaxMouthR = snorlaxMouthL + 30;
-	var snorlaxMouthT = snorlax.y + 10;
-	var snorlaxMouthB = snorlaxMouthT +20;
-	if(snorlax.mouthOpen) {
-		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += gameSettings.pointsPerPokeballEaten;
-			return true;
-		}
-		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
-			gameState.score += gameSettings.pointsPerPokeballEaten;
-			return true;
-		}
-		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += gameSettings.pointsPerPokeballEaten;
-			return true;
-		}
-		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
-			gameState.score += gameSettings.pointsPerPokeballEaten;
-			return true;
-		}
-	} else {
-		if(dis <= rad) {
+    
+    mouthP = [
+        {"x": snorlax.x - 15, "y": snorlax.y + 10},
+        {"x": snorlax.x - 15, "y": snorlax.y + 30},
+        {"x": snorlax.x + 15, "y": snorlax.y + 30},
+        {"x": snorlax.x + 15, "y": snorlax.y + 10},
+    ];
+    
+    this.rotatePoint = function(pi) {
+        return {"x": Math.cos(snorlax.rotation) * (pi.x - snorlax.x) - Math.sin(snorlax.rotation) * (pi.y - snorlax.y) + snorlax.x, 
+                "y": Math.sin(snorlax.rotation) * (pi.x - snorlax.x) + Math.cos(snorlax.rotation) * (pi.y - snorlax.y) + snorlax.y};
+    };
+    // Rotation of point (px, py) around point (ox, oy).
+    //p'x = cos(theta) * (px-ox) - sin(theta) * (py-oy) + ox
+    //p'y = sin(theta) * (px-ox) + cos(theta) * (py-oy) + oy
+    mouthPTrans = mouthP.map(this.rotatePoint);
+    
+    // Determinant of [(x0, y0, 1), 
+    //                   (x1, y1, 1), 
+    //                   (x2, y2, 1)]
+    // = (.5)(x1*y2 - y1*x2 -x0*y2 + y0*x2 + x0*y1 - y0*x1)
+    // Used by Ball.Collide
+    function det(p0, p1, p2) {
+        return (.5) * (p1.x * p2.y - p1.y * p2.x - p0.x * p2.y + p0.y * p2.x + p0.x * p1.y - p0.y * p1.x);
+    }
+    
+    function getSign(i) {
+        return i < 0 ? -1 : 1;
+    }
+    
+    // p1, p2, p
+    p = {"x": this.x, "y": this.y};
+    detSigns = [
+        getSign(det(mouthPTrans[0], mouthPTrans[1], p)),
+        getSign(det(mouthPTrans[1], mouthPTrans[2], p)),
+        getSign(det(mouthPTrans[2], mouthPTrans[3], p)),
+        getSign(det(mouthPTrans[3], mouthPTrans[0], p)),
+    ];
+    
+    if(snorlax.mouthOpen) {
+        if(detSigns[0] === detSigns[1] && detSigns[1] === detSigns[2] && detSigns[2] === detSigns[3]) {
+            gameState.score += gameSettings.pointsPerPokeballEaten;
+            return true;
+        }
+    } else {
+        if(dis <= rad) {
             snorlax.health -= gameSettings.damagePerPokeballHit;
             if(snorlax.health < 0) {
                 snorlax.health = 0;
             }
-			snorlax.hit = true;
-			return true;
+            snorlax.hit = true;
+            return true;
         }
-	}
-
+    }
 }
 
 //TODO(tanay): Make this better
@@ -691,7 +715,6 @@ function checkLose() {
     if(snorlax.health <= 0) {
         gameState.paused = true;
         clearCanvas();
-        ctx.fillText("Game Over, you've been caught!", 400, 400);
         ctx.fillStyle = "black";
         ctx.font = "25px Arial";
         ctx.textAlign = "center";
@@ -706,13 +729,13 @@ function clearCanvas() {
 function redraw() {
     if(!gameState.paused) {
         clearCanvas();
-		drawBackground();
-        drawSnorlax(snorlax);
+        drawBackground();
         drawHud();
-		if(gameStateLevel()) {
-			console.log("balls generated");
-			generateBalls();
-		}
+        drawSnorlax(snorlax);
+        if(gameStateLevel()) {
+            console.log("balls generated");
+            generateBalls();
+        }
         drawBalls();
         checkLose();
     }
