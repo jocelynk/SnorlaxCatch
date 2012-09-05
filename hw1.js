@@ -27,10 +27,10 @@ var gameSettings = {
 var ballState = {
     radius: 10, // Radius of pokeball
     // Arrays for pokeballs
-    top: [],
-    right: [],
-    left: [],
-    bottom: [],
+    top: {"arr": [], "side":"top"},
+    right: {"arr": [], "side":"right"},
+    left: {"arr": [], "side":"left"},
+    bottom: {"arr": [], "side":"bottom"},
 }
     
 var gameState = {
@@ -411,13 +411,23 @@ function drawBackground() {
     drawFlower(710, 320, "blue");
     drawFlower(850, 480, "pink");
 }
-
-//splice after hit wall, add new ball
-//put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
-function drawBalls(){
-    for (i in ballState.top) {
-        ballState.top[i].Create();
-        ballState.top[i].y += ballState.top[i].dy;
+var balls = function(state) { 
+	for(i in state.arr) {
+		state.arr[i].Create();
+		switch(state.side) {
+			case 'top':
+				state.arr[i].y += state.arr[i].dy;
+				break;
+			case 'bottom':
+				state.arr[i].y -= state.arr[i].dy;		
+				break;
+			case 'right':
+				state.arr[i].x -= state.arr[i].dx;
+				break;
+			case 'left':
+				state.arr[i].x += state.arr[i].dx;
+				break;	
+		}
 		switch(gameState.level) {
 			case 1:
 			case 2:
@@ -428,89 +438,24 @@ function drawBalls(){
 				break;
 
 		}
-        if(gameState.level != 1) {
-        }
         // Boundary checking
-        ballState.top[i].Bounce();
-        if(ballState.top[i].Collide()) {
+        state.arr[i].Bounce();
+        if(state.arr[i].Collide()) {
             if(i === 0)
-                ballState.top.splice(0,1);
+                state.arr.splice(0,1);
             else 
-                ballState.top.splice(i,1);
+                state.arr.splice(i,1);
                 setTimeout(function() {snorlax.hit = false;}, 1000);
         };
-    }
-    for (i in ballState.right) {
-        ballState.right[i].Create();
-        ballState.right[i].x -= ballState.right[i].dx;
-		switch(gameState.level) {
-			case 1:
-			case 2:
-				break;
-			case 3:
-			case 4:
-				ballState.right[i].y += ballState.right[i].dy;
-				break;
-
-		}
-        //Boundary checking
-        ballState.right[i].Bounce();
-        if(ballState.right[i].Collide()) {
-            if(i === 0)
-                ballState.right.splice(0,1);
-            else 
-                ballState.right.splice(i,1);
-                setTimeout(function() {snorlax.hit = false;}, 1000);
-        };
-
-    }
-    for (i in ballState.left) {
-        ballState.left[i].Create();
-        ballState.left[i].x += ballState.left[i].dx;
-       switch(gameState.level) {
-			case 1:
-			case 2:
-				break;
-			case 3:
-			case 4:
-				ballState.left[i].y += ballState.left[i].dy;
-				break;
-
-		}
-        // Boundary checking
-        ballState.left[i].Bounce();
-       if(ballState.left[i].Collide()) {
-            if(i === 0)
-                ballState.left.splice(0,1);
-            else 
-                ballState.left.splice(i,1);
-                setTimeout(function() {snorlax.hit = false;}, 1000);
-        };
-
-    }
-    for (i in ballState.bottom) {
-        ballState.bottom[i].Create();
-        ballState.bottom[i].y -= ballState.bottom[i].dy;
-        switch(gameState.level) {
-			case 1:
-			case 2:
-				break;
-			case 3:
-			case 4:
-				ballState.bottom[i].y += ballState.bottom[i].dy;
-				break;
-
-		}
-        //Boundary checking
-        ballState.bottom[i].Bounce();
-        if(ballState.bottom[i].Collide()) {
-            if(i === 0)
-                ballState.bottom.splice(0,1);
-            else 
-                ballState.bottom.splice(i,1);
-                setTimeout(function() {snorlax.hit = false;}, 1000);
-        };
-    }
+	}
+};
+//splice after hit wall, add new ball
+//put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
+function drawBalls(s1, s2, s3, s4, func){
+  func(s1);
+  func(s2);
+  func(s3);
+  func(s4);
 }
 
 function initSleepToggler() {
@@ -605,16 +550,16 @@ function generateBalls() {
 
 		switch(gameState.level) {
 			case 1:
-				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 2:
-				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 3:
-				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 			case 4:
-				ballState.top.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
 				break;
 		}
       
@@ -626,14 +571,14 @@ function generateBalls() {
 			case 1:
 				break;
 			case 2:
-				ballState.right.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-				ballState.left.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+				ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
 				break;
 			case 3:
 				break;
 			case 4:
-				ballState.right.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-				ballState.left.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+				ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
 				break;
 		}
     }
@@ -816,7 +761,7 @@ function redraw() {
 		//ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
             generateBalls();
         }
-        drawBalls();
+        drawBalls(ballState.top, ballState.left, ballState.right, ballState.bottom, balls);
         checkLose();
 		checkWin();
     }
