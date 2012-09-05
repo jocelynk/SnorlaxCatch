@@ -1,6 +1,13 @@
 /**
  * Global variables
  */
+ //first level - balls on one side
+ //second level - balls on all sides
+ //third level - balls moving at angles from a few sides
+ //fourth level - balls moving at all sides at all angles
+ //larger area of mouth detection/indication of mouth detection
+ //pause before each level
+ //display highscore at the end
 var canvas = document.getElementById("myCanvas"),
     ctx = canvas.getContext('2d');
 
@@ -321,7 +328,6 @@ function gameStateLevel() {
 	//console.log(ballState.top.length);
 	if (ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
 		gameState.level++;
-		console.log(gameState.level);
 		return true;
 	} else {
 		return false;
@@ -411,8 +417,17 @@ function drawBalls(){
     for (i in ballState.top) {
         ballState.top[i].Create();
         ballState.top[i].y += ballState.top[i].dy;
+		switch(gameState.level) {
+			case 1:
+			case 2:
+				break;
+			case 3:
+			case 4:
+				ballState.top[i].x += ballState.top[i].dx;
+				break;
+
+		}
         if(gameState.level != 1) {
-            ballState.top[i].x += ballState.top[i].dx;
         }
         // Boundary checking
         ballState.top[i].Bounce();
@@ -421,7 +436,6 @@ function drawBalls(){
 				ballState.top.splice(0,1);
 			else 
 				ballState.top.splice(i,1);
-			console.log(ballState.top.length);
 				setTimeout(function() {snorlax.hit = false;}, 1000);
 		};
 
@@ -429,9 +443,16 @@ function drawBalls(){
     for (i in ballState.right) {
         ballState.right[i].Create();
         ballState.right[i].x -= ballState.right[i].dx;
-        if(gameState.level != 1) {
-            ballState.right[i].y += ballState.right[i].dy;
-        }
+		switch(gameState.level) {
+			case 1:
+			case 2:
+				break;
+			case 3:
+			case 4:
+				ballState.right[i].y += ballState.right[i].dy;
+				break;
+
+		}
         //Boundary checking
         ballState.right[i].Bounce();
         if(ballState.right[i].Collide()) {
@@ -446,9 +467,16 @@ function drawBalls(){
     for (i in ballState.left) {
         ballState.left[i].Create();
         ballState.left[i].x += ballState.left[i].dx;
-        if(gameState.level != 1) {
-            ballState.left[i].y += ballState.left[i].dy;
-        }
+       switch(gameState.level) {
+			case 1:
+			case 2:
+				break;
+			case 3:
+			case 4:
+				ballState.left[i].y += ballState.left[i].dy;
+				break;
+
+		}
         // Boundary checking
         ballState.left[i].Bounce();
        if(ballState.left[i].Collide()) {
@@ -463,9 +491,16 @@ function drawBalls(){
     for (i in ballState.bottom) {
         ballState.bottom[i].Create();
         ballState.bottom[i].y -= ballState.bottom[i].dy;
-        if(gameState.level != 1) {
-            ballState.bottom[i].x += ballState.bottom[i].dx;
-        }
+        switch(gameState.level) {
+			case 1:
+			case 2:
+				break;
+			case 3:
+			case 4:
+				ballState.bottom[i].y += ballState.bottom[i].dy;
+				break;
+
+		}
         //Boundary checking
         ballState.bottom[i].Bounce();
         if(ballState.bottom[i].Collide()) {
@@ -560,21 +595,47 @@ function generateBalls() {
     var h = 0;
     var random_x = Math.floor(Math.random() * 5) + 1;
     var random_y = Math.floor(Math.random() * 5) + 1;
-    if(gameState.level == 1) {
+    if(gameState.level == 1 || gameState.level == 2) {
          random_x = 3;
          random_y = 3;
     }
     
     while(w<800) {
-        w += ballState.radius + 150;
-        ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
-        ballState.bottom.push(new Ball(w + 100, canvas.height + 11, 10, random_x, random_y, "bottom", false));
+		w += ballState.radius + 150;
+
+		switch(gameState.level) {
+			case 1:
+				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				break;
+			case 2:
+				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				break;
+			case 3:
+				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				break;
+			case 4:
+				ballState.top.push(new Ball(w, -11, 10, random_x, random_y, "top", false));
+				break;
+		}
+      
     }
 
     while(h<600) {
         h += ballState.radius + 150;
-        ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
-        ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+		switch(gameState.level) {
+			case 1:
+				break;
+			case 2:
+				//ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
+				//ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+				break;
+			case 3:
+				break;
+			case 4:
+				ballState.right.push(new Ball(canvas.width+11,h,10,3,3,"right",false));
+				ballState.left.push(new Ball(-11,h+100,10,3,3,"left",false));
+				break;
+		}
     }
     
     //ballState.top.push(new Ball(canvas.width/2,-11,10,3,3));
@@ -657,19 +718,19 @@ Ball.prototype.Collide = function () {
 	var snorlaxMouthT = snorlax.y + 10;
 	var snorlaxMouthB = snorlaxMouthT +20;
 	if(snorlax.mouthOpen) {
-		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
+		if(this.x+10 > snorlaxMouthL+10 && this.x+10 < snorlaxMouthR+10 && this.y+10 > snorlaxMouthT+10 && this.y+10 < snorlaxMouthB) {
 			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
-		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y+10 > snorlaxMouthT && this.y+10 < snorlaxMouthB) {
+		if(this.x-10 > snorlaxMouthL+10 && this.x-10 < snorlaxMouthR+10 && this.y+10 > snorlaxMouthT+10 && this.y+10 < snorlaxMouthB) {
 			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
-		if(this.x+10 > snorlaxMouthL && this.x+10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
+		if(this.x+10 > snorlaxMouthL+10 && this.x+10 < snorlaxMouthR+10 && this.y-10 > snorlaxMouthT+10 && this.y-10 < snorlaxMouthB+10) {
 			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
-		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT && this.y-10 < snorlaxMouthB) {
+		if(this.x-10 > snorlaxMouthL && this.x-10 < snorlaxMouthR && this.y-10 > snorlaxMouthT+10 && this.y-10 < snorlaxMouthB+10) {
 			gameState.score += gameSettings.pointsPerPokeballEaten;
 			return true;
 		}
@@ -699,6 +760,20 @@ function checkLose() {
     }
 }
 
+function checkWin() {
+	if(gameState.level == 4 && ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
+		gameState.paused = true;
+		clearCanvas();
+		ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
+        ctx.fillStyle = "black";
+        ctx.font = "25px Arial";
+        ctx.textAlign = "center";
+		ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
+		ctx.fillText("SCORE", 400, 500);
+		ctx.fillText(gameState.score, 500,500);
+	}        
+}
+
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -715,6 +790,7 @@ function redraw() {
 		}
         drawBalls();
         checkLose();
+		checkWin();
     }
 }
 
