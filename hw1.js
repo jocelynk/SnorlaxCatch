@@ -1,4 +1,4 @@
-function SnorlaxMunch() {
+function snorlaxMunch() {
     /**
      * Global variables
      */
@@ -13,91 +13,82 @@ function SnorlaxMunch() {
         ctx = canvas.getContext('2d');
 
     var snorlaxMunchGame = this;
-    
-    var defaults = {
-        gameSettings : {
-            pointsPerPokeballEaten: 10,
-            damagePerPokeballHit: 25,
-            maxHealth: 100,
-            maxAwakeMeter: 100,
-            awakeMeterRechargeDelta: 1,
-            awakeMeterDrainDelta: -1,
-            snorlaxMoveSpeed: 5, // must be positive
-        },
-            
-        /**
-         * Global objects
-         */
-         menuState: {
+
+    var gameSettings = {
+        pointsPerPokeballEaten: 10,
+        damagePerPokeballHit: 25,
+        maxHealth: 100,
+        maxAwakeMeter: 100,
+        awakeMeterRechargeDelta: 1,
+        awakeMeterDrainDelta: -1,
+        snorlaxMoveSpeed: 5, // must be positive
+    };
+   
+    var keyControls = {
+        "87": {type: "move", value: "up"}, // w
+        "65": {type: "move", value: "left"}, // a
+        "83": {type: "move", value: "down"}, // s
+        "68": {type: "move", value: "right"}, // d
+        "80": {type: "game", value: "pause"}, // p
+        "82": {type: "game", value: "restart"}, //r
+        "38": {type: "menu", value: "menuup"}, // Up Arrow
+        "40": {type: "menu", value: "menudown"}, // Down Arrow
+        "13": {type: "menu", value: "menuenter"}, // Enter
+        "27": {type: "menu", value: "menuesc"}, // Esc
+    };
+   
+    /**
+     * Global objects
+     */
+    function AllState() {
+        this.menuState = {
             choice: 0,
             picked: false,
             menuId: undefined,
-        },
-         
-        ballState: {
+        };
+             
+        this.ballState = {
             radius: 10, // Radius of pokeball
             // Arrays for pokeballs
             top: {"arr": [], "side":"top"},
             right: {"arr": [], "side":"right"},
             left: {"arr": [], "side":"left"},
             bottom: {"arr": [], "side":"bottom"},
-        },
-            
-        gameState: {
+        };
+                
+        this.gameState = {
             score: 0, // Number of pokeballs eaten
             paused: false, // Game paused
+            ended: 0,
             level: 1, // Difficulty level
             stInt: undefined // Redraw timer interval, to be instantiated later.
-        },
+        };
 
-        keyControls: {
-            "87": {type: "move", value: "up"}, // w
-            "65": {type: "move", value: "left"}, // a
-            "83": {type: "move", value: "down"}, // s
-            "68": {type: "move", value: "right"}, // d
-            "80": {type: "game", value: "pause"}, // p
-            "38": {type: "menu", value: "menuup"}, // Up Arrow
-            "40": {type: "menu", value: "menudown"}, // Down Arrow
-            "13": {type: "menu", value: "menuenter"}, // Enter
-            "27": {type: "menu", value: "menuesc"}, // Esc
-        },
-    };
-
-    // Pull out of instantiation for proper closure for awakeMeter/etc values.
-    defaults.snorlax = {
-            x: canvas.width / 2, // x position of center of snorlax
-            y: canvas.height / 2, // y position of center of snorlax
-            dx: 0, // x motion of snorlax
-            dy: 0, // y motion of snorlax
+        this.snorlax = {
+            x: canvas.width / 2, // x position of center of allState.snorlax
+            y: canvas.height / 2, // y position of center of allState.snorlax
+            dx: 0, // x motion of allState.snorlax
+            dy: 0, // y motion of allState.snorlax
             rotation: 0, // Radians rotated
             zState: 0, // Where the Z for sleep appears (up/down/etc)
             mouthOpen: false, // Mouth is open for eating pokeballs
-            awakeMeter: defaults.gameSettings.maxAwakeMeter, // Amount of awake energy for keeping mouth open
-            awakeMeterDelta: defaults.gameSettings.awakeMeterRechargeDelta, // Amount awake energy changes per tick
-            health: defaults.gameSettings.maxHealth, // Current HP
-            radius: 50, // Radius of snorlax sprite
+            awakeMeter: gameSettings.maxAwakeMeter, // Amount of awake energy for keeping mouth open
+            awakeMeterDelta: gameSettings.awakeMeterRechargeDelta, // Amount awake energy changes per tick
+            health: gameSettings.maxHealth, // Current HP
+            radius: 50, // Radius of allState.snorlax sprite
             hit: false
+        };
     };
     
-    var gameSettings = defaults.gameSettings,
-        menuState = defaults.menuState,
-        ballState = defaults.ballState,
-        gameState = defaults.gameState,
-        snorlax = defaults.snorlax,
-        keyControls = defaults.keyControls;
+    var allState = new AllState();
     
     function setDefaults() {
-        gameSettings = defaults.gameSettings;
-        menuState = defaults.menuState;
-        ballState = defaults.ballState;
-        gameState = defaults.gameState;
-        snorlax = defaults.snorlax;
-        keyControls = defaults.keyControls;
+        allState = new AllState();
     }
     
     function destroyGame() {
-        clearInterval(menuState.menuId);
-        clearInterval(gameState.stInt);
+        clearInterval(allState.menuState.menuId);
+        clearInterval(allState.gameState.stInt);
         removeEventListeners();
     }
     
@@ -121,17 +112,17 @@ function SnorlaxMunch() {
     function onMouseMove(event) {
         var x = event.pageX - canvas.offsetLeft;
         var y = event.pageY - canvas.offsetTop;
-        var x = snorlax.x - x;
-        var y = snorlax.y - y;
+        var x = allState.snorlax.x - x;
+        var y = allState.snorlax.y - y;
         rotateSnorlax(Math.atan2(y, x) - Math.PI/2); // Polar angle rotation, offset to have cursor on opposite side of mouth
     }
 
     function onMouseDown(event) {
-        snorlax.mouthOpen = true;
+        allState.snorlax.mouthOpen = true;
     }
 
     function onMouseUp(event) {
-        snorlax.mouthOpen = false;
+        allState.snorlax.mouthOpen = false;
     }
 
     /**
@@ -165,7 +156,10 @@ function SnorlaxMunch() {
     function handleGameInput(input) {
         switch(input) {
             case "pause":
-                gameState.paused = !gameState.paused;
+                allState.gameState.paused = !allState.gameState.paused;
+                break;
+            case "restart":
+                resetGame();
                 break;
         }
     }
@@ -173,25 +167,26 @@ function SnorlaxMunch() {
     function handleMenuInput(input) {
         switch(input) {
             case "menuup":
-                if(menuState.choice > 0 && menuState.picked === false)
-                    menuState.choice--;
+                if(allState.menuState.choice > 0 && allState.menuState.picked === false)
+                    allState.menuState.choice--;
                 break;
             case "menudown":
-                if(menuState.choice < 2 && menuState.picked === false)
-                    menuState.choice++;
+                if(allState.menuState.choice < 2 && allState.menuState.picked === false)
+                    allState.menuState.choice++;
                 break;
             case "menuenter":
-                if(menuState.picked === true) {
+                console.log(allState.menuState);
+                if(allState.menuState.picked === true) {
                     break;
                 }
-                clearInterval(menuState.menuId);
-                menuState.picked = true;
-                switch(menuState.choice) {
+                clearInterval(allState.menuState.menuId);
+                allState.menuState.picked = true;
+                switch(allState.menuState.choice) {
                     case 0:
                         main();
                         break;
                     case 1:
-                        menuState.menuId = setInterval(displayControls, 20);
+                        allState.menuState.menuId = setInterval(displayControls, 20);
                         break;
                     case 2:
                         displayQuit();
@@ -199,75 +194,75 @@ function SnorlaxMunch() {
                 }
                 break;
             case "menuesc":
-                if(menuState.picked === true && menuState.choice === 1)
+                if(allState.menuState.picked === true && allState.menuState.choice === 1)
                 {
-                    clearInterval(menuState.menuId);
-                    menuState.picked = false;
-                    menuState.menuId = setInterval(drawMenu, 20);
+                    clearInterval(allState.menuState.menuId);
+                    allState.menuState.picked = false;
+                    allState.menuState.menuId = setInterval(drawMenu, 20);
                 }
                 break;
         }
     }
 
     /**
-     * Snorlax helpers
+     * allState.snorlax helpers
      */
     function moveSnorlax(direction) {
-        if(gameState.paused) {
+        if(allState.gameState.paused) {
             return;
         }
         
         switch(direction) {
             case "up":
-                snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
+                allState.snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
                 break;
             case "down":
-                snorlax.dy = gameSettings.snorlaxMoveSpeed;
+                allState.snorlax.dy = gameSettings.snorlaxMoveSpeed;
                 break;
             case "left":
-                snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
+                allState.snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
                 break;
             case "right":
-                snorlax.dx = gameSettings.snorlaxMoveSpeed;
+                allState.snorlax.dx = gameSettings.snorlaxMoveSpeed;
                 break;
         }
     }
 
     function stopMoveSnorlax(direction) {
-        if(gameState.paused) {
+        if(allState.gameState.paused) {
             return;
         }
         
         switch(direction) {
             case "up":
-                snorlax.dy = 0;
+                allState.snorlax.dy = 0;
                 break;
             case "down":
-                snorlax.dy = 0;
+                allState.snorlax.dy = 0;
                 break;
             case "left":
-                snorlax.dx = 0;
+                allState.snorlax.dx = 0;
                 break;
             case "right":
-                snorlax.dx = 0;
+                allState.snorlax.dx = 0;
                 break;
         }
     }
 
     function rotateSnorlax(angle) {
-        snorlax.rotation = angle;    
+        allState.snorlax.rotation = angle;    
     }
 
     function updateSnorlaxPosition() {
-        snorlax.x += snorlax.dx;
-        snorlax.y += snorlax.dy;
+        allState.snorlax.x += allState.snorlax.dx;
+        allState.snorlax.y += allState.snorlax.dy;
     }
 
-    function drawSnorlax(snorlax) {
+    function drawSnorlax() {
         ctx.save();
         updateSnorlaxPosition();
-        ctx.translate(snorlax.x, snorlax.y);
-        ctx.rotate(snorlax.rotation);
+        ctx.translate(allState.snorlax.x, allState.snorlax.y);
+        ctx.rotate(allState.snorlax.rotation);
         drawSnorlaxSprite();
         ctx.restore();
     }
@@ -275,15 +270,15 @@ function SnorlaxMunch() {
     /**
      * Drawing functions
      */
-    //snorlax X  and Y - center of the circle
+    //allState.snorlax X  and Y - center of the circle
     function drawSnorlaxSprite(){
         //Center coordinate for face (center at origin for drawing purposes).
-        //Actual position is in snorlax.x and snorlax.y.
+        //Actual position is in allState.snorlax.x and allState.snorlax.y.
         var snorlaxX = 0;
         var snorlaxY = 0;
-        var snorlaxR = snorlax.radius;
-        var mouthOpen = snorlax.mouthOpen;
-        var zState = snorlax.zState;
+        var snorlaxR = allState.snorlax.radius;
+        var mouthOpen = allState.snorlax.mouthOpen;
+        var zState = allState.snorlax.zState;
         // Colors for face and stuff
         var faceColor = "rgb(178, 173, 131)";
         var eyeColor = "black";
@@ -291,12 +286,12 @@ function SnorlaxMunch() {
         var textColor = "black";
         var teethColor = "white";
         var mouthColor = ((mouthOpen === true) ? "rgb(251, 113, 83)":"black");
-        //face for snorlax
+        //face for allState.snorlax
         function circle(ctx, cx, cy, radius) {
             ctx.arc(cx, cy, radius, 0, 2*Math.PI, true);
         }
         
-        if(!snorlax.hit)
+        if(!allState.snorlax.hit)
             ctx.fillStyle = faceColor;    
         else
             ctx.fillStyle = "rgb(186, 7, 16)";
@@ -382,10 +377,10 @@ function SnorlaxMunch() {
     }
 
     function drawHud() {
-        var snorlaxHealth = (snorlax.health <= 100) ? snorlax.health : 100;
-        var snorlaxSleep = (snorlax.awakeMeter <= 100) ? snorlax.awakeMeter : 100;
-        var snorlaxLevel = gameState.level;
-        var snorlaxPoints = gameState.score;
+        var snorlaxHealth = (allState.snorlax.health <= 100) ? allState.snorlax.health : 100;
+        var snorlaxSleep = (allState.snorlax.awakeMeter <= 100) ? allState.snorlax.awakeMeter : 100;
+        var snorlaxLevel = allState.gameState.level;
+        var snorlaxPoints = allState.gameState.score;
         var healthX = 100;
         var healthY = 700;
         var sleepX = 100;
@@ -410,11 +405,11 @@ function SnorlaxMunch() {
     }
 
     function gameStateLevel() {
-        //later check if snorlax is alive
-        //console.log(ballState.top.length);
-        if (ballState.top.arr.length == 0 && ballState.bottom.arr.length == 0 && ballState.right.arr.length == 0 && ballState.left.arr.length == 0) {
-            gameState.level++;
-            console.log(gameState.level);
+        //later check if allState.snorlax is alive
+        //console.log(allState.ballState.top.length);
+        if (allState.ballState.top.arr.length == 0 && allState.ballState.bottom.arr.length == 0 && allState.ballState.right.arr.length == 0 && allState.ballState.left.arr.length == 0) {
+            allState.gameState.level++;
+            console.log(allState.gameState.level);
             return true;
         } else {
             return false;
@@ -503,25 +498,25 @@ function SnorlaxMunch() {
             switch(state.side) {
                 case 'top':
                     state.arr[i].y += state.arr[i].dy;
-                    if(gameState.level == 3 || gameState.level == 4) {
+                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
                         state.arr[i].x += state.arr[i].dx;
                     }
                     break;
                 case 'bottom':
                     state.arr[i].y -= state.arr[i].dy;	
-                    if(gameState.level == 3 || gameState.level == 4) {
+                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
                         state.arr[i].x -= state.arr[i].dx;
                     }				
                     break;
                 case 'right':
                     state.arr[i].x -= state.arr[i].dx;
-                    if(gameState.level == 3 || gameState.level == 4) {
+                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
                         state.arr[i].y -= state.arr[i].dy;
                     }
                     break;
                 case 'left':
                     state.arr[i].x += state.arr[i].dx;
-                    if(gameState.level == 3 || gameState.level == 4) {
+                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
                         state.arr[i].y += state.arr[i].dy;
                     }
                     break;	
@@ -533,7 +528,7 @@ function SnorlaxMunch() {
                     state.arr.splice(0,1);
                 else 
                     state.arr.splice(i,1);
-                    setTimeout(function() {snorlax.hit = false;}, 1000);
+                    setTimeout(function() {allState.snorlax.hit = false;}, 1000);
             };
         }
     };
@@ -548,26 +543,26 @@ function SnorlaxMunch() {
 
     function initSleepToggler() {
         setInterval(function() {
-            snorlax.zState = (snorlax.zState + 1) % 2;
+            allState.snorlax.zState = (allState.snorlax.zState + 1) % 2;
         }, 500);
     }
 
     function initAwakeMeter() {
-        snorlax.awakeMeterInterval = setInterval(function() {
-            if(snorlax.mouthOpen) {
-                snorlax.awakeMeterDelta = gameSettings.awakeMeterDrainDelta;
+        allState.snorlax.awakeMeterInterval = setInterval(function() {
+            if(allState.snorlax.mouthOpen) {
+                allState.snorlax.awakeMeterDelta = gameSettings.awakeMeterDrainDelta;
             }
             else {
-                snorlax.awakeMeterDelta = gameSettings.awakeMeterRechargeDelta;
+                allState.snorlax.awakeMeterDelta = gameSettings.awakeMeterRechargeDelta;
             }
 
-            snorlax.awakeMeter += snorlax.awakeMeterDelta;
-            if(snorlax.awakeMeter <= 0) {
-                snorlax.awakeMeter = 0;
-                snorlax.mouthOpen = false;
+            allState.snorlax.awakeMeter += allState.snorlax.awakeMeterDelta;
+            if(allState.snorlax.awakeMeter <= 0) {
+                allState.snorlax.awakeMeter = 0;
+                allState.snorlax.mouthOpen = false;
             }
-            else if(snorlax.awakeMeter >= 100) {
-                snorlax.awakeMeter = 100;
+            else if(allState.snorlax.awakeMeter >= 100) {
+                allState.snorlax.awakeMeter = 100;
             }
         }, 10);
     }
@@ -671,44 +666,44 @@ function SnorlaxMunch() {
         var h = 0;
         var random_x = Math.floor(Math.random() * 5) + 1;
         var random_y = Math.floor(Math.random() * 5) + 1;
-        if(gameState.level == 1 ||  gameState.level == 2) {
+        if(allState.gameState.level == 1 ||  allState.gameState.level == 2) {
              random_x = 3;
              random_y = 3;
         }
         
         while(w<800) {
-            w += ballState.radius + 150;
+            w += allState.ballState.radius + 150;
 
-            switch(gameState.level) {
+            switch(allState.gameState.level) {
                 case 1:
-                    ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
                     break;
                 case 2:
-                    ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
+                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
                     break;
                 case 3:
-                    ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
                     break;
                 case 4:
-                    ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
                     break;
             }
           
         }
 
         while(h<600) {
-            h += ballState.radius + 150;
-            switch(gameState.level) {
+            h += allState.ballState.radius + 150;
+            switch(allState.gameState.level) {
                 case 1:
                     break;
                 case 2:
-                    ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+                    allState.ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
                     break;
                 case 3:
                     break;
                 case 4:
-                    ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-                    ballState.left.arr.push(new GreatBall(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+                    allState.ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+                    allState.ballState.left.arr.push(new GreatBall(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
                     break;
             }
         }
@@ -783,19 +778,19 @@ function SnorlaxMunch() {
 
     Ball.prototype.Collide = function () {
         // TODO(jocelyn): Make sure the mouth detection happens before and overrides the body detection.
-        var dis = Math.sqrt(Math.pow((this.x - snorlax.x), 2) + Math.pow((this.y - snorlax.y), 2));
-        var rad = this.radius + snorlax.radius;
+        var dis = Math.sqrt(Math.pow((this.x - allState.snorlax.x), 2) + Math.pow((this.y - allState.snorlax.y), 2));
+        var rad = this.radius + allState.snorlax.radius;
 
         mouthP = [
-            {"x": snorlax.x - 15, "y": snorlax.y + 10},
-            {"x": snorlax.x - 15, "y": snorlax.y + 30},
-            {"x": snorlax.x + 15, "y": snorlax.y + 30},
-            {"x": snorlax.x + 15, "y": snorlax.y + 10},
+            {"x": allState.snorlax.x - 15, "y": allState.snorlax.y + 10},
+            {"x": allState.snorlax.x - 15, "y": allState.snorlax.y + 30},
+            {"x": allState.snorlax.x + 15, "y": allState.snorlax.y + 30},
+            {"x": allState.snorlax.x + 15, "y": allState.snorlax.y + 10},
         ];
         
         this.rotatePoint = function(pi) {
-            return {"x": Math.cos(snorlax.rotation) * (pi.x - snorlax.x) - Math.sin(snorlax.rotation) * (pi.y - snorlax.y) + snorlax.x, 
-                    "y": Math.sin(snorlax.rotation) * (pi.x - snorlax.x) + Math.cos(snorlax.rotation) * (pi.y - snorlax.y) + snorlax.y};
+            return {"x": Math.cos(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) - Math.sin(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.x, 
+                    "y": Math.sin(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) + Math.cos(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.y};
         };
         // Rotation of point (px, py) around point (ox, oy).
         //p'x = cos(theta) * (px-ox) - sin(theta) * (py-oy) + ox
@@ -824,72 +819,106 @@ function SnorlaxMunch() {
             getSign(det(mouthPTrans[3], mouthPTrans[0], p)),
         ];
         
-        if(snorlax.mouthOpen) {
+        if(allState.snorlax.mouthOpen) {
             if(detSigns[0] === detSigns[1] && detSigns[1] === detSigns[2] && detSigns[2] === detSigns[3]) {
-                gameState.score += gameSettings.pointsPerPokeballEaten;
+                allState.gameState.score += gameSettings.pointsPerPokeballEaten;
                 return true;
             }
         } else {
             if(dis <= rad) {
-                snorlax.health -= gameSettings.damagePerPokeballHit;
-                if(snorlax.health < 0) {
-                    snorlax.health = 0;
+                allState.snorlax.health -= gameSettings.damagePerPokeballHit;
+                if(allState.snorlax.health < 0) {
+                    allState.snorlax.health = 0;
                 }
-                snorlax.hit = true;
+                allState.snorlax.hit = true;
                 return true;
             }
         }
     }
 
+    function drawPaused() {   
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(0, 0, 1000, 800);
+        ctx.fillStyle = "orange";
+        ctx.fillText("Hit P to resume.", 500, 500);
+    }
+    
     //TODO(tanay): Make this better
     function checkLose() {
-        if(snorlax.health <= 0) {
-            gameState.paused = true;
-            clearCanvas();
-            ctx.fillStyle = "black";
-            ctx.font = "25px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("Game Over, You've been caught!", 400, 400);
-            resetGame();
+        if(!allState.gameState.ended && allState.snorlax.health <= 0) {
+            allState.gameState.ended = 1;            
         }
+    }
+    
+    function drawLose() {
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(0, 0, 1000, 800);
+        ctx.fillStyle = "orange";
+        ctx.fillText("Game Over!", 500, 300);
+        ctx.fillText("You've been caught!", 500, 350);
+        ctx.fillText("Hit R to restart", 500, 450);
     }
 
     function checkWin() {
-        if(gameState.level == 4 && ballState.top.arr.length == 0 && ballState.bottom.arr.length == 0 && ballState.right.arr.length == 0 && ballState.left.arr.length == 0) {
-            gameState.paused = true;
-            clearCanvas();
-            ctx.fillStyle = "black";
-            ctx.font = "25px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
-            ctx.fillText("SCORE", 400, 500);
-            ctx.fillText(gameState.score, 500,500);
-        }        
+        if(allState.gameState.level == 4 && allState.ballState.top.arr.length == 0 && allState.ballState.bottom.arr.length == 0 && allState.ballState.right.arr.length == 0 && allState.ballState.left.arr.length == 0) {
+            allState.gameState.ended = 2;
+        }
     }
 
+    function drawWin() {
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(0, 0, 1000, 800);
+        ctx.fillStyle = "orange";
+        ctx.fillText("You won, you've eaten all the Pokeballs!", 500, 300);
+        ctx.fillText("SCORE", 500, 350);
+        ctx.fillText(allState.gameState.score, 500, 400);
+        ctx.fillText("Hit R to restart", 500, 500);
+    }
+    
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     function redraw() {
-        if(!gameState.paused) {
-            clearCanvas();
-            drawBackground();
-            drawHud();
-            drawSnorlax(snorlax);
-            if(gameStateLevel()) {
-                //ctx.fillStyle = 'red';
-                //ctx.globalAlpha=0.2;
-                //ctx.fillRect(0,0,canvas.width,canvas.height);
-                //ctx.fillStyle = "black";
-            //ctx.font = "25px Arial";
-           // ctx.textAlign = "center";
-            //ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
-                generateBalls();
-            }
-            drawBalls(ballState.top, ballState.left, ballState.right, ballState.bottom, balls);
-            checkLose();
-            checkWin();
+        clearCanvas();
+        drawBackground();
+        switch(allState.gameState.ended) {
+            case 0:
+                if(!allState.gameState.paused) {
+                    drawHud();
+                    drawSnorlax();
+                    if(gameStateLevel()) {
+                        //ctx.fillStyle = 'red';
+                        //ctx.globalAlpha=0.2;
+                        //ctx.fillRect(0,0,canvas.width,canvas.height);
+                        //ctx.fillStyle = "black";
+                    //ctx.font = "25px Arial";
+                   // ctx.textAlign = "center";
+                    //ctx.fillText("You won, you've eaten all the Pokeballs!", 400, 400);
+                        generateBalls();
+                    }
+                    drawBalls(allState.ballState.top, allState.ballState.left, allState.ballState.right, allState.ballState.bottom, balls);
+                    checkLose();
+                    checkWin();
+                } else {
+                    drawPaused();
+                }
+                break;
+            case 1: //lose
+                drawLose();
+                break;
+            case 2: //win
+                drawWin();
+                break;
         }
     }
 
@@ -917,7 +946,7 @@ function SnorlaxMunch() {
         generateBalls(); // Create an array to store the balls info
         
         redraw(); // Initial draw
-        gameState.stInt = setInterval(redraw, 20);  // Redraw loop.
+        allState.gameState.stInt = setInterval(redraw, 20);  // Redraw loop.
         
         // Give focus to capture key inputs.
         canvas.setAttribute('tabindex', '0');
@@ -938,11 +967,12 @@ function SnorlaxMunch() {
         ctx.fillStyle = "white";
         ctx.fillText("Use WASD to Move, and the mouse to rotate.", 500, 300);
         ctx.fillText("Click to open Snorlax's Mouth.", 500, 350);
-        ctx.fillText("Eat as many pokeballs as you can.", 500, 400);
-        ctx.fillText("But be careful, if you get hit anywhere but your mouth, you lose health.", 500, 450);
-        ctx.fillText("Now go show that trainer who is the boss.", 500, 500);
+        ctx.fillText("P to pause the game", 500, 400);
+        ctx.fillText("Eat as many pokeballs as you can.", 500, 450);
+        ctx.fillText("But be careful, if you get hit anywhere but your mouth, you lose health.", 500, 500);
+        ctx.fillText("Now go show that trainer who is the boss.", 500, 550);
         ctx.fillStyle = "orange";
-        ctx.fillText("Hit Esc to go back to the Menu.", 500, 550);	
+        ctx.fillText("Hit Esc to go back to the Menu.", 500, 600);
     }
 
     function displayQuit() {
@@ -950,12 +980,12 @@ function SnorlaxMunch() {
         drawBackground();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.font = "bold 50px sans-serif";
+        ctx.font = "bold 40px sans-serif";
         ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
         ctx.fillRect(0, 0, 1000, 800);
         ctx.fillStyle = "white";
-        ctx.fillText("Without your help, snorlax was captured.", 500, 300);
-        ctx.fillText("Think about this before you quit.", 500, 500);
+        ctx.fillText("Without your help, Snorlax was captured.", 500, 300);
+        ctx.fillText("Hope you're happy.", 500, 500);
     }
     function drawMenu() {
         clearCanvas();
@@ -985,17 +1015,17 @@ function SnorlaxMunch() {
         ctx.fillText("Quit", 500, 500);
         
         ctx.strokeStyle = "orange";
-        ctx.strokeRect(392,268 + (100 * menuState.choice),215,55);
+        ctx.strokeRect(392,268 + (100 * allState.menuState.choice),215,55);
     }
 
-    SnorlaxMunch.prototype.introMenu = function() {
+    snorlaxMunch.prototype.introMenu = function() {
         addEventListeners();
         drawMenu();
-        menuState.menuId = setInterval(drawMenu, 20);
+        allState.menuState.menuId = setInterval(drawMenu, 20);
         canvas.setAttribute('tabindex', '0');
         canvas.focus();
     }
 }
 
-var snorlaxGame = new SnorlaxMunch();
+var snorlaxGame = new snorlaxMunch();
 snorlaxGame.introMenu();
