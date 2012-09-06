@@ -463,8 +463,10 @@ function drawBackground() {
     drawFlower(710, 320, "blue");
     drawFlower(850, 480, "pink");
 }
+/**Draw Pokeballs - First Class Functions**/
 var balls = function(state) { 
 	for(i in state.arr) {
+		console.log(state.arr[i]);
 		state.arr[i].Create();
 		switch(state.side) {
 			case 'top':
@@ -503,8 +505,7 @@ var balls = function(state) {
         };
 	}
 };
-//splice after hit wall, add new ball
-//put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
+
 function drawBalls(s1, s2, s3, s4, func){
   func(s1);
   func(s2);
@@ -586,61 +587,6 @@ Ball.prototype.Create = function () {
     this.ctx.fill();
     this.ctx.stroke();
     this.ctx.closePath();
-}
-
-
-function generateBalls() {
-    var w = 0;
-    var h = 0;
-    var random_x = Math.floor(Math.random() * 5) + 1;
-    var random_y = Math.floor(Math.random() * 5) + 1;
-    if(gameState.level == 1 ||  gameState.level == 2) {
-         random_x = 3;
-         random_y = 3;
-    }
-    
-    while(w<800) {
-		w += ballState.radius + 150;
-
-		switch(gameState.level) {
-			case 1:
-				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-				break;
-			case 2:
-				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
-				break;
-			case 3:
-				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-				break;
-			case 4:
-				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-				break;
-		}
-      
-    }
-
-    while(h<600) {
-        h += ballState.radius + 150;
-		switch(gameState.level) {
-			case 1:
-				break;
-			case 2:
-				ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-				ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
-				break;
-			case 3:
-				break;
-			case 4:
-				ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-				ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
-				break;
-		}
-    }
-    
-    //ballState.top.push(new Ball(canvas.width/2,-11,10,3,3));
-    //ballState.right.push(new Ball(canvas.width+11,canvas.height/2,10,3,3));
-    //ballState.left.push(new Ball(-11,canvas.height/2,10,3,3));
-    //ballState.bottom.push(new Ball(canvas.width/2,canvas.height+11,10,3,3));
 }
 
 Ball.prototype.Bounce = function () {
@@ -769,6 +715,99 @@ Ball.prototype.Collide = function () {
         }
     }
 }
+
+
+function GreatBall(x, y, radius, dx, dy, side, created) {
+	Ball.call(this, x, y, radius, dx, dy, side, created);
+	this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+}
+
+GreatBall.prototype = new Ball();
+GreatBall.prototype.constructor = GreatBall;
+
+GreatBall.prototype.Create = function() {
+	this.ctx.beginPath();
+    this.ctx.fillStyle = "blue";
+    this.ctx.lineWidth = "2"
+    this.ctx.arc(this.x, this.y, this.radius, 0, 3 * Math.PI, true);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.closePath();
+
+    this.ctx.beginPath();
+    this.ctx.fillStyle = "white";
+    this.ctx.lineWidth = "2"
+    this.ctx.arc(this.x, this.y, this.radius, Math.PI, 0, true);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.closePath();
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(this.x - this.radius, this.y);
+    this.ctx.moveTo(this.x, this.y);
+    this.ctx.lineTo(this.x + this.radius, this.y);
+    this.ctx.stroke();
+    this.ctx.closePath();
+
+    this.ctx.beginPath();
+    this.ctx.fillStyle="black";
+    this.ctx.lineWidth="2"
+    this.ctx.arc(this.x,this.y,this.radius/6.25,0,Math.PI*4,true);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.closePath();
+}
+
+function generateBalls() {
+    var w = 0;
+    var h = 0;
+    var random_x = Math.floor(Math.random() * 5) + 1;
+    var random_y = Math.floor(Math.random() * 5) + 1;
+    if(gameState.level == 1 ||  gameState.level == 2) {
+         random_x = 3;
+         random_y = 3;
+    }
+    
+    while(w<800) {
+		w += ballState.radius + 150;
+
+		switch(gameState.level) {
+			case 1:
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				break;
+			case 2:
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
+				break;
+			case 3:
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				break;
+			case 4:
+				ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+				break;
+		}
+      
+    }
+
+    while(h<600) {
+        h += ballState.radius + 150;
+		switch(gameState.level) {
+			case 1:
+				break;
+			case 2:
+				ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				break;
+			case 3:
+				break;
+			case 4:
+				ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+				ballState.left.arr.push(new GreatBall(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+				break;
+		}
+    }
+}
+
 
 //TODO(tanay): Make this better
 function checkLose() {
