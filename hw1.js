@@ -326,7 +326,7 @@ function drawHud() {
 function gameStateLevel() {
     //later check if snorlax is alive
     //console.log(ballState.top.length);
-    if (ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
+    if (ballState.top.arr.length == 0 && ballState.bottom.arr.length == 0 && ballState.right.arr.length == 0 && ballState.left.arr.length == 0) {
         gameState.level++;
         console.log(gameState.level);
         return true;
@@ -417,26 +417,28 @@ var balls = function(state) {
 		switch(state.side) {
 			case 'top':
 				state.arr[i].y += state.arr[i].dy;
+				if(gameState.level == 3 || gameState.level == 4) {
+					state.arr[i].x += state.arr[i].dx;
+				}
 				break;
 			case 'bottom':
-				state.arr[i].y -= state.arr[i].dy;		
+				state.arr[i].y -= state.arr[i].dy;	
+				if(gameState.level == 3 || gameState.level == 4) {
+					state.arr[i].x -= state.arr[i].dx;
+				}				
 				break;
 			case 'right':
 				state.arr[i].x -= state.arr[i].dx;
+				if(gameState.level == 3 || gameState.level == 4) {
+					state.arr[i].y -= state.arr[i].dy;
+				}
 				break;
 			case 'left':
 				state.arr[i].x += state.arr[i].dx;
+				if(gameState.level == 3 || gameState.level == 4) {
+					state.arr[i].y += state.arr[i].dy;
+				}
 				break;	
-		}
-		switch(gameState.level) {
-			case 1:
-			case 2:
-				break;
-			case 3:
-			case 4:
-				ballState.top[i].x += ballState.top[i].dx;
-				break;
-
 		}
         // Boundary checking
         state.arr[i].Bounce();
@@ -540,7 +542,7 @@ function generateBalls() {
     var h = 0;
     var random_x = Math.floor(Math.random() * 5) + 1;
     var random_y = Math.floor(Math.random() * 5) + 1;
-    if(gameState.level == 1 || gameState.level == 2) {
+    if(gameState.level == 1 ||  gameState.level == 2) {
          random_x = 3;
          random_y = 3;
     }
@@ -729,7 +731,7 @@ function checkLose() {
 }
 
 function checkWin() {
-	if(gameState.level == 4 && ballState.top.length == 0 && ballState.bottom.length == 0 && ballState.right.length == 0 && ballState.left.length == 0) {
+	if(gameState.level == 4 && ballState.top.arr.length == 0 && ballState.bottom.arr.length == 0 && ballState.right.arr.length == 0 && ballState.left.arr.length == 0) {
 		gameState.paused = true;
 		clearCanvas();
 		ctx.fillStyle = "black";
