@@ -4,7 +4,6 @@
  * Jocelyn Kong (jocelynk)
  * Sid Soundararajan (ssoundar)
  */
-
 function SnorlaxMunch() {
     /**
      * Global variables
@@ -23,20 +22,50 @@ function SnorlaxMunch() {
         awakeMeterDrainDelta: -1,
         snorlaxMoveSpeed: 5, // must be positive
     };
-   
+
     var keyControls = {
-        "87": {type: "move", value: "up"}, // w
-        "65": {type: "move", value: "left"}, // a
-        "83": {type: "move", value: "down"}, // s
-        "68": {type: "move", value: "right"}, // d
-        "80": {type: "game", value: "pause"}, // p
-        "82": {type: "game", value: "restart"}, //r
-        "38": {type: "menu", value: "menuup"}, // Up Arrow
-        "40": {type: "menu", value: "menudown"}, // Down Arrow
-        "13": {type: "menu", value: "menuenter"}, // Enter
-        "27": {type: "menu", value: "menuesc"}, // Esc
+        "87": {
+            type: "move",
+            value: "up"
+        }, // w
+        "65": {
+            type: "move",
+            value: "left"
+        }, // a
+        "83": {
+            type: "move",
+            value: "down"
+        }, // s
+        "68": {
+            type: "move",
+            value: "right"
+        }, // d
+        "80": {
+            type: "game",
+            value: "pause"
+        }, // p
+        "82": {
+            type: "game",
+            value: "restart"
+        }, //r
+        "38": {
+            type: "menu",
+            value: "menuup"
+        }, // Up Arrow
+        "40": {
+            type: "menu",
+            value: "menudown"
+        }, // Down Arrow
+        "13": {
+            type: "menu",
+            value: "menuenter"
+        }, // Enter
+        "27": {
+            type: "menu",
+            value: "menuesc"
+        }, // Esc
     };
-   
+
     /**
      * Game state object
      */
@@ -46,16 +75,28 @@ function SnorlaxMunch() {
             picked: false,
             menuId: undefined,
         };
-             
+
         this.ballState = {
             radius: 10, // Radius of pokeball
             // Arrays for pokeballs
-            top: {"arr": [], "side":"top"},
-            right: {"arr": [], "side":"right"},
-            left: {"arr": [], "side":"left"},
-            bottom: {"arr": [], "side":"bottom"},
+            top: {
+                "arr": [],
+                "side": "top"
+            },
+            right: {
+                "arr": [],
+                "side": "right"
+            },
+            left: {
+                "arr": [],
+                "side": "left"
+            },
+            bottom: {
+                "arr": [],
+                "side": "bottom"
+            },
         };
-                
+
         this.gameState = {
             score: 0, // Number of pokeballs eaten
             paused: false, // Game paused
@@ -79,9 +120,9 @@ function SnorlaxMunch() {
             hit: false,
         };
     };
-    
+
     var allState = new AllState();
-    
+
     /**
      * Game reset helpers
      */
@@ -89,7 +130,7 @@ function SnorlaxMunch() {
         // Restore the game state to defaults
         allState = new AllState();
     }
-    
+
     function destroyGame() {
         // Avoid doubled intervals/event listeners
         clearInterval(allState.menuState.menuId);
@@ -98,13 +139,13 @@ function SnorlaxMunch() {
         clearInterval(allState.snorlax.awakeMeterInterval);
         removeEventListeners();
     }
-    
+
     function resetGame() {
         destroyGame();
         setDefaults();
         snorlaxMunchGame.introMenu();
     }
-    
+
     /**
      * Event handlers
      */
@@ -121,7 +162,7 @@ function SnorlaxMunch() {
         var y = event.pageY - canvas.offsetTop;
         var x = allState.snorlax.x - x;
         var y = allState.snorlax.y - y;
-        rotateSnorlax(Math.atan2(y, x) - Math.PI/2); // Polar angle rotation, offset to have cursor on opposite side of mouth
+        rotateSnorlax(Math.atan2(y, x) - Math.PI / 2); // Polar angle rotation, offset to have cursor on opposite side of mouth
     }
 
     function onMouseDown(event) {
@@ -136,79 +177,78 @@ function SnorlaxMunch() {
      * Event handler helpers
      */
     function handleKeyDown(input) {
-        if(input === undefined) {
+        if (input === undefined) {
             return;
         }
-        switch(input.type) {
-            case "move":
-                moveSnorlax(input.value);
-                break;
-            case "game":
-                handleGameInput(input.value);
-                break;
-            case "menu":
-                handleMenuInput(input.value);
-                break;
+        switch (input.type) {
+        case "move":
+            moveSnorlax(input.value);
+            break;
+        case "game":
+            handleGameInput(input.value);
+            break;
+        case "menu":
+            handleMenuInput(input.value);
+            break;
         }
 
     }
 
     function handleKeyUp(input) {
-        if(input === undefined || input.type !== "move") {
+        if (input === undefined || input.type !== "move") {
             return;
         }
         stopMoveSnorlax(input.value);
     }
 
     function handleGameInput(input) {
-        switch(input) {
-            case "pause":
-                allState.gameState.paused = !allState.gameState.paused;
-                break;
-            case "restart":
-                resetGame();
-                break;
+        switch (input) {
+        case "pause":
+            allState.gameState.paused = !allState.gameState.paused;
+            break;
+        case "restart":
+            resetGame();
+            break;
         }
     }
 
     function handleMenuInput(input) {
-        switch(input) {
-            case "menuup":
-                if(allState.menuState.choice > 0 && allState.menuState.picked === false) {
-                    allState.menuState.choice--;
-                }
+        switch (input) {
+        case "menuup":
+            if (allState.menuState.choice > 0 && allState.menuState.picked === false) {
+                allState.menuState.choice--;
+            }
+            break;
+        case "menudown":
+            if (allState.menuState.choice < 2 && allState.menuState.picked === false) {
+                allState.menuState.choice++;
+            }
+            break;
+        case "menuenter":
+            if (allState.menuState.picked === true) {
                 break;
-            case "menudown":
-                if(allState.menuState.choice < 2 && allState.menuState.picked === false) {
-                    allState.menuState.choice++;
-                }
+            }
+            clearInterval(allState.menuState.menuId);
+            allState.menuState.picked = true;
+            switch (allState.menuState.choice) {
+            case 0:
+                playGame();
                 break;
-            case "menuenter":
-                if(allState.menuState.picked === true) {
-                    break;
-                }
+            case 1:
+                allState.menuState.menuId = setInterval(displayControls, 20);
+                break;
+            case 2:
+                displayQuit();
+                break;
+            }
+            break;
+        case "menuesc":
+            if (allState.menuState.picked === true && allState.menuState.choice === 1) {
                 clearInterval(allState.menuState.menuId);
-                allState.menuState.picked = true;
-                switch(allState.menuState.choice) {
-                    case 0:
-                        playGame();
-                        break;
-                    case 1:
-                        allState.menuState.menuId = setInterval(displayControls, 20);
-                        break;
-                    case 2:
-                        displayQuit();
-                        break;
-                }
-                break;
-            case "menuesc":
-                if(allState.menuState.picked === true && allState.menuState.choice === 1)
-                {
-                    clearInterval(allState.menuState.menuId);
-                    allState.menuState.picked = false;
-                    allState.menuState.menuId = setInterval(drawMenu, 20);
-                }
-                break;
+                allState.menuState.picked = false;
+                allState.menuState.menuId = setInterval(drawMenu, 20);
+            }
+            break;
         }
     }
 
@@ -216,49 +256,49 @@ function SnorlaxMunch() {
      * Snorlax helpers
      */
     function moveSnorlax(direction) {
-        if(allState.gameState.paused) {
+        if (allState.gameState.paused) {
             return;
         }
-        
-        switch(direction) {
-            case "up":
-                allState.snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
-                break;
-            case "down":
-                allState.snorlax.dy = gameSettings.snorlaxMoveSpeed;
-                break;
-            case "left":
-                allState.snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
-                break;
-            case "right":
-                allState.snorlax.dx = gameSettings.snorlaxMoveSpeed;
-                break;
+
+        switch (direction) {
+        case "up":
+            allState.snorlax.dy = -1 * gameSettings.snorlaxMoveSpeed;
+            break;
+        case "down":
+            allState.snorlax.dy = gameSettings.snorlaxMoveSpeed;
+            break;
+        case "left":
+            allState.snorlax.dx = -1 * gameSettings.snorlaxMoveSpeed;
+            break;
+        case "right":
+            allState.snorlax.dx = gameSettings.snorlaxMoveSpeed;
+            break;
         }
     }
 
     function stopMoveSnorlax(direction) {
-        if(allState.gameState.paused) {
+        if (allState.gameState.paused) {
             return;
         }
-        
-        switch(direction) {
-            case "up":
-                allState.snorlax.dy = 0;
-                break;
-            case "down":
-                allState.snorlax.dy = 0;
-                break;
-            case "left":
-                allState.snorlax.dx = 0;
-                break;
-            case "right":
-                allState.snorlax.dx = 0;
-                break;
+
+        switch (direction) {
+        case "up":
+            allState.snorlax.dy = 0;
+            break;
+        case "down":
+            allState.snorlax.dy = 0;
+            break;
+        case "left":
+            allState.snorlax.dx = 0;
+            break;
+        case "right":
+            allState.snorlax.dx = 0;
+            break;
         }
     }
 
     function rotateSnorlax(angle) {
-        allState.snorlax.rotation = angle;    
+        allState.snorlax.rotation = angle;
     }
 
     function updateSnorlaxPosition() {
@@ -278,7 +318,7 @@ function SnorlaxMunch() {
     /**
      * Drawing functions
      */
-    function drawSnorlaxSprite(){
+    function drawSnorlaxSprite() {
         // Center coordinate for face (center at origin for drawing purposes).
         // Actual position is in allState.snorlax.x and allState.snorlax.y.
         var snorlaxX = 0;
@@ -292,78 +332,76 @@ function SnorlaxMunch() {
         var earColor = "rgb(46,82,79)";
         var textColor = "black";
         var teethColor = "white";
-        var mouthColor = ((mouthOpen === true) ? "rgb(251, 113, 83)":"black");
+        var mouthColor = ((mouthOpen === true) ? "rgb(251, 113, 83)" : "black");
         // Face for snorlax
         function circle(ctx, cx, cy, radius) {
-            ctx.arc(cx, cy, radius, 0, 2*Math.PI, true);
+            ctx.arc(cx, cy, radius, 0, 2 * Math.PI, true);
         }
-        
-        if(!allState.snorlax.hit)
-            ctx.fillStyle = faceColor;    
-        else
-            ctx.fillStyle = "rgb(186, 7, 16)";
-        
+
+        if (!allState.snorlax.hit) ctx.fillStyle = faceColor;
+        else ctx.fillStyle = "rgb(186, 7, 16)";
+
         ctx.beginPath();
         circle(ctx, snorlaxX, snorlaxY, snorlaxR);
         ctx.fill();
-     
-        //eyes
+
+        // Eyes
         ctx.fillStyle = eyeColor;
         ctx.fillRect(snorlaxX - 30, snorlaxY - 20, 20, 5);
         ctx.fillRect(snorlaxX + 10, snorlaxY - 20, 20, 5);
-     
-        //mouth
+
+        // Mouth
         ctx.fillStyle = mouthColor;
-        if(mouthOpen) {
-            //coord of mouth
+        if (mouthOpen) {
+            // Coord of mouth
             ctx.fillRect(snorlaxX - 15, snorlaxY + 10, 30, 20);
         } else {
             ctx.fillRect(snorlaxX - 15, snorlaxY + 10, 30, 5);
         }
-        
-        //ears
+
+        // Ears
         ctx.fillStyle = earColor;
         ctx.beginPath();
         ctx.moveTo(snorlaxX - 43, snorlaxY - 25);
         ctx.lineTo(snorlaxX - 38, snorlaxY - 25 - 40);
-        ctx.lineTo(snorlaxX,      snorlaxY - snorlaxR);
-        ctx.arc(snorlaxX, snorlaxY, 50, -Math.PI/2, 3.665, true);
+        ctx.lineTo(snorlaxX, snorlaxY - snorlaxR);
+        ctx.arc(snorlaxX, snorlaxY, 50, - Math.PI / 2, 3.665, true);
         ctx.fill();
-     
+
         ctx.fillStyle = earColor;
         ctx.beginPath();
         ctx.moveTo(snorlaxX + 43, snorlaxY - 25);
         ctx.lineTo(snorlaxX + 38, snorlaxY - 25 - 40);
-        ctx.lineTo(snorlaxX,      snorlaxY - snorlaxR);
-        ctx.arc(snorlaxX, snorlaxY, 50, -Math.PI/2, -0.52, false);
+        ctx.lineTo(snorlaxX, snorlaxY - snorlaxR);
+        ctx.arc(snorlaxX, snorlaxY, 50, - Math.PI / 2, - 0.52, false);
         ctx.fill();
-     
-        //zzzzs
+
+        // Zzzzs
         ctx.fillStyle = textColor;
         ctx.font = "20px Arial";
         ctx.textAlign = "center";
-        if(!mouthOpen) {
-            if(zState === 0) {
+        if (!mouthOpen) {
+            if (zState === 0) {
                 ctx.fillText("Z", snorlaxX + 45, snorlaxY - 55);
             } else {
                 ctx.fillText("Z", snorlaxX + 53, snorlaxY - 60);
             }
         }
-     
-        //Face surrounding.
+
+        // Face surrounding.
         ctx.fillStyle = earColor;
-                
+
         ctx.beginPath();
         ctx.moveTo(snorlaxX + 25, snorlaxY + 43);
-        ctx.arc(snorlaxX , snorlaxY , 45, 0.8, -1.05, true);
+        ctx.arc(snorlaxX, snorlaxY, 45, 0.8, - 1.05, true);
         ctx.lineTo(snorlaxX, snorlaxY - 30);
         ctx.lineTo(snorlaxX - 22, snorlaxY - 38);
-        ctx.arc(snorlaxX , snorlaxY , 45, 4.19, 2.09, true);
+        ctx.arc(snorlaxX, snorlaxY, 45, 4.19, 2.09, true);
         ctx.lineTo(snorlaxX - 16, snorlaxY + 47);
-        ctx.arc(snorlaxX , snorlaxY , 50, 2.09, 1.05, false);
+        ctx.arc(snorlaxX, snorlaxY, 50, 2.09, 1.05, false);
         ctx.fill();
-     
-        //Teeth
+
+        // Teeth
         ctx.fillStyle = teethColor;
         ctx.beginPath();
         ctx.moveTo(snorlaxX - 15, snorlaxY + 10);
@@ -419,60 +457,60 @@ function SnorlaxMunch() {
         ctx.fillStyle = "green";
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x-25, y);
-        ctx.arc(x-25-45, y , 45, 0, -0.8, true);
-        ctx.lineTo(x-10, y-15);
-        ctx.lineTo(x, y-40);
-        ctx.lineTo(x+10, y-15);
-        ctx.arc(x+25+45, y , 45, Math.PI+0.8, Math.PI, true);
+        ctx.lineTo(x - 25, y);
+        ctx.arc(x - 25 - 45, y, 45, 0, - 0.8, true);
+        ctx.lineTo(x - 10, y - 15);
+        ctx.lineTo(x, y - 40);
+        ctx.lineTo(x + 10, y - 15);
+        ctx.arc(x + 25 + 45, y, 45, Math.PI + 0.8, Math.PI, true);
         ctx.fill();
     }
 
     function drawFlower(x, y, color) {
         ctx.beginPath();
         ctx.fillStyle = "yellow";
-        ctx.arc(x, y, 5, 0, 2*Math.PI, true);
+        ctx.arc(x, y, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(x+10, y, 5, 0, 2*Math.PI, true);
+        ctx.arc(x + 10, y, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x-10, y, 5, 0, 2*Math.PI, true);
+        ctx.arc(x - 10, y, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x, y+10, 5, 0, 2*Math.PI, true);
+        ctx.arc(x, y + 10, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x, y-10, 5, 0, 2*Math.PI, true);
+        ctx.arc(x, y - 10, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x+7, y-7, 5, 0, 2*Math.PI, true);
+        ctx.arc(x + 7, y - 7, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x-7, y-7, 5, 0, 2*Math.PI, true);
+        ctx.arc(x - 7, y - 7, 5, 0, 2 * Math.PI, true);
         ctx.fill();
-        ctx.arc(x+7, y+7, 5, 0, 2*Math.PI, true);
+        ctx.arc(x + 7, y + 7, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(x-7, y+7, 5, 0, 2*Math.PI, true);
+        ctx.arc(x - 7, y + 7, 5, 0, 2 * Math.PI, true);
         ctx.fill();
 
         ctx.strokeStyle = "green";
-        ctx.lineWidth=6;
+        ctx.lineWidth = 6;
         ctx.beginPath();
-        ctx.moveTo(x, y+15);
-        ctx.lineTo(x,y+25);
-        ctx.lineTo(x+2, y+26);
-        ctx.lineTo(x-2, y+26);
+        ctx.moveTo(x, y + 15);
+        ctx.lineTo(x, y + 25);
+        ctx.lineTo(x + 2, y + 26);
+        ctx.lineTo(x - 2, y + 26);
         ctx.closePath();
         ctx.stroke();
     }
 
     function drawBackground() {
-        ctx.fillStyle= "lightgreen";
-        ctx.fillRect(0,0,canvas.width, canvas.height);
-        drawGrass(50,50);
+        ctx.fillStyle = "lightgreen";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawGrass(50, 50);
         drawGrass(556, 600);
         drawGrass(311, 411);
         drawGrass(637, 200);
@@ -490,78 +528,74 @@ function SnorlaxMunch() {
         drawFlower(710, 320, "blue");
         drawFlower(850, 480, "pink");
     }
-    
-    var balls = function(state) { 
-        for(i in state.arr) {
+
+    var balls = function (state) {
+        for (i in state.arr) {
             state.arr[i].Create();
-            switch(state.side) {
-                case 'top':
-                    state.arr[i].y += state.arr[i].dy;
-                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
-                        state.arr[i].x += state.arr[i].dx;
-                    }
-                    break;
-                case 'bottom':
-                    state.arr[i].y -= state.arr[i].dy;
-                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
-                        state.arr[i].x -= state.arr[i].dx;
-                    }
-                    break;
-                case 'right':
-                    state.arr[i].x -= state.arr[i].dx;
-                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
-                        state.arr[i].y -= state.arr[i].dy;
-                    }
-                    break;
-                case 'left':
+            switch (state.side) {
+            case 'top':
+                state.arr[i].y += state.arr[i].dy;
+                if (allState.gameState.level == 3 || allState.gameState.level == 4) {
                     state.arr[i].x += state.arr[i].dx;
-                    if(allState.gameState.level == 3 || allState.gameState.level == 4) {
-                        state.arr[i].y += state.arr[i].dy;
-                    }
-                    break;
+                }
+                break;
+            case 'bottom':
+                state.arr[i].y -= state.arr[i].dy;
+                if (allState.gameState.level == 3 || allState.gameState.level == 4) {
+                    state.arr[i].x -= state.arr[i].dx;
+                }
+                break;
+            case 'right':
+                state.arr[i].x -= state.arr[i].dx;
+                if (allState.gameState.level == 3 || allState.gameState.level == 4) {
+                    state.arr[i].y -= state.arr[i].dy;
+                }
+                break;
+            case 'left':
+                state.arr[i].x += state.arr[i].dx;
+                if (allState.gameState.level == 3 || allState.gameState.level == 4) {
+                    state.arr[i].y += state.arr[i].dy;
+                }
+                break;
             }
             // Boundary checking
             state.arr[i].Bounce();
-            if(state.arr[i].Collide()) {
-                if(i === 0)
-                    state.arr.splice(0,1);
-                else 
-                    state.arr.splice(i,1);
-                    setTimeout(function() {allState.snorlax.hit = false;}, 1000);
+            if (state.arr[i].Collide()) {
+                if (i === 0) state.arr.splice(0, 1);
+                else state.arr.splice(i, 1);
+                setTimeout(function () {
+                    allState.snorlax.hit = false;
+                }, 1000);
             };
         }
     };
-    
-    //splice after hit wall, add new ball
-    //put in separate function, if gets to end of canvas, splice ball from array, randomly add new ones
-    function drawBalls(s1, s2, s3, s4, func){
-      func(s1);
-      func(s2);
-      func(s3);
-      func(s4);
+
+    function drawBalls(s1, s2, s3, s4, func) {
+        func(s1);
+        func(s2);
+        func(s3);
+        func(s4);
     }
 
     function initSleepToggler() {
-        allState.snorlax.sleepToggler = setInterval(function() {
+        allState.snorlax.sleepToggler = setInterval(function () {
             allState.snorlax.zState = (allState.snorlax.zState + 1) % 2;
         }, 500);
     }
 
     function initAwakeMeter() {
-        allState.snorlax.awakeMeterInterval = setInterval(function() {
-            if(allState.snorlax.mouthOpen) {
+        allState.snorlax.awakeMeterInterval = setInterval(function () {
+            if (allState.snorlax.mouthOpen) {
                 allState.snorlax.awakeMeterDelta = gameSettings.awakeMeterDrainDelta;
-            }
-            else {
+            } else {
                 allState.snorlax.awakeMeterDelta = gameSettings.awakeMeterRechargeDelta;
             }
 
             allState.snorlax.awakeMeter += allState.snorlax.awakeMeterDelta;
-            if(allState.snorlax.awakeMeter <= 0) {
+            if (allState.snorlax.awakeMeter <= 0) {
                 allState.snorlax.awakeMeter = 0;
                 allState.snorlax.mouthOpen = false;
-            }
-            else if(allState.snorlax.awakeMeter >= 100) {
+            } else if (allState.snorlax.awakeMeter >= 100) {
                 allState.snorlax.awakeMeter = 100;
             }
         }, 10);
@@ -582,7 +616,7 @@ function SnorlaxMunch() {
         this.created = created
     }
 
-    //creates a Pokeball
+    // Creates a Pokeball
     Ball.prototype.Create = function () {
         this.ctx.beginPath();
         this.ctx.fillStyle = "red";
@@ -609,14 +643,14 @@ function SnorlaxMunch() {
         this.ctx.closePath();
 
         this.ctx.beginPath();
-        this.ctx.fillStyle="white";
-        this.ctx.lineWidth="2"
-        this.ctx.arc(this.x,this.y,this.radius/6.25,0,Math.PI*4,true);
+        this.ctx.fillStyle = "white";
+        this.ctx.lineWidth = "2"
+        this.ctx.arc(this.x, this.y, this.radius / 6.25, 0, Math.PI * 4, true);
         this.ctx.fill();
         this.ctx.stroke();
         this.ctx.closePath();
     }
-    
+
     function GreatBall(x, y, radius, dx, dy, side, created) {
         Ball.call(this, x, y, radius, dx, dy, side, created);
         this.canvas = canvas;
@@ -626,7 +660,7 @@ function SnorlaxMunch() {
     GreatBall.prototype = new Ball();
     GreatBall.prototype.constructor = GreatBall;
 
-    GreatBall.prototype.Create = function() {
+    GreatBall.prototype.Create = function () {
         this.ctx.beginPath();
         this.ctx.fillStyle = "blue";
         this.ctx.lineWidth = "2"
@@ -652,9 +686,9 @@ function SnorlaxMunch() {
         this.ctx.closePath();
 
         this.ctx.beginPath();
-        this.ctx.fillStyle="black";
-        this.ctx.lineWidth="2"
-        this.ctx.arc(this.x,this.y,this.radius/6.25,0,Math.PI*4,true);
+        this.ctx.fillStyle = "black";
+        this.ctx.lineWidth = "2"
+        this.ctx.arc(this.x, this.y, this.radius / 6.25, 0, Math.PI * 4, true);
         this.ctx.fill();
         this.ctx.stroke();
         this.ctx.closePath();
@@ -666,109 +700,109 @@ function SnorlaxMunch() {
         var h = 0;
         var random_x = Math.floor(Math.random() * 5) + 1;
         var random_y = Math.floor(Math.random() * 5) + 1;
-        if(allState.gameState.level == 1 ||  allState.gameState.level == 2) {
-             random_x = 3;
-             random_y = 3;
+        if (allState.gameState.level == 1 || allState.gameState.level == 2) {
+            random_x = 3;
+            random_y = 3;
         }
-        
-        while(w<800) {
+
+        while (w < 800) {
             w += allState.ballState.radius + 150;
 
-            switch(allState.gameState.level) {
-                case 1:
-                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-                    break;
-                case 2:
-                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1, "top", false));
-                    break;
-                case 3:
-                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-                    break;
-                case 4:
-                    allState.ballState.top.arr.push(new Ball(w, -11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
-                    break;
+            switch (allState.gameState.level) {
+            case 1:
+                allState.ballState.top.arr.push(new Ball(w, - 11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                break;
+            case 2:
+                allState.ballState.top.arr.push(new Ball(w, - 11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                break;
+            case 3:
+                allState.ballState.top.arr.push(new Ball(w, - 11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                break;
+            case 4:
+                allState.ballState.top.arr.push(new Ball(w, - 11, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "top", false));
+                break;
             }
-          
+
         }
 
-        while(h<600) {
+        while (h < 600) {
             h += allState.ballState.radius + 150;
-            switch(allState.gameState.level) {
-                case 1:
-                    break;
-                case 2:
-                    allState.ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-                    break;
-                case 3:
-                    break;
-                case 4:
-                    allState.ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-                    allState.ballState.left.arr.push(new GreatBall(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
-                    break;
+            switch (allState.gameState.level) {
+            case 1:
+                break;
+            case 2:
+                allState.ballState.right.arr.push(new GreatBall(canvas.width + 11, h, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "right", false));
+                break;
+            case 3:
+                break;
+            case 4:
+                allState.ballState.right.arr.push(new GreatBall(canvas.width + 11, h, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "right", false));
+                allState.ballState.left.arr.push(new GreatBall(-11, h + 100, 10, Math.floor(Math.random() * 5) + 1, Math.floor(Math.random() * 5) + 1, "left", false));
+                break;
             }
         }
     }
 
     Ball.prototype.Bounce = function () {
-        if(this.side == "top") {
-            if(this.y >= (canvas.height)) {
+        if (this.side == "top") {
+            if (this.y >= (canvas.height)) {
                 this.dy *= -1
                 this.created = true;
             }
-            
-            if(this.x >= (canvas.width)) {
+
+            if (this.x >= (canvas.width)) {
                 this.dx *= -1
                 this.created = true;
             }
 
-            if(this.y <= this.radius && this.created) { 
+            if (this.y <= this.radius && this.created) {
                 this.dy *= -1;
             }
-            
-            if(this.x <= this.radius) {
+
+            if (this.x <= this.radius) {
                 this.dx *= -1
             }
-        } else if(this.side == "bottom") {
-            if(this.y <= this.radius) {
+        } else if (this.side == "bottom") {
+            if (this.y <= this.radius) {
                 this.dy *= -1;
                 this.created = true;
             }
-            if(this.x >= (canvas.width)) {
+            if (this.x >= (canvas.width)) {
                 this.dx *= -1
                 this.created = true;
             }
-            if(this.y >= (canvas.height) && this.created) {
+            if (this.y >= (canvas.height) && this.created) {
                 this.dy *= -1;
             }
-            if(this.x <= this.radius) {
+            if (this.x <= this.radius) {
                 this.dx *= -1
             }
-        } else if(this.side == "right") {
-            if(this.x <= this.radius) {
+        } else if (this.side == "right") {
+            if (this.x <= this.radius) {
                 this.dx *= -1;
                 this.created = true;
             }
-            if(this.y >= canvas.height) {
+            if (this.y >= canvas.height) {
                 this.dy *= -1;
             }
-            if(this.x >= (canvas.width) && this.created) {
+            if (this.x >= (canvas.width) && this.created) {
                 this.dx *= -1;
             }
-            if(this.y <= this.radius) {
+            if (this.y <= this.radius) {
                 this.dy *= -1
             }
         } else {
-            if(this.x >= canvas.width) {
+            if (this.x >= canvas.width) {
                 this.dx *= -1;
                 this.created = true;
             }
-            if(this.y >= canvas.height) {
+            if (this.y >= canvas.height) {
                 this.dy *= -1;
             }
-            if(this.x <= (this.radius) && this.created) {
+            if (this.x <= (this.radius) && this.created) {
                 this.dx *= -1;
             }
-            if(this.y <= this.radius) {
+            if (this.y <= this.radius) {
                 this.dy *= -1
             }
         }
@@ -778,22 +812,31 @@ function SnorlaxMunch() {
         var dis = Math.sqrt(Math.pow((this.x - allState.snorlax.x), 2) + Math.pow((this.y - allState.snorlax.y), 2));
         var rad = this.radius + allState.snorlax.radius;
 
-        mouthP = [
-            {"x": allState.snorlax.x - 15, "y": allState.snorlax.y + 10},
-            {"x": allState.snorlax.x - 15, "y": allState.snorlax.y + 30},
-            {"x": allState.snorlax.x + 15, "y": allState.snorlax.y + 30},
-            {"x": allState.snorlax.x + 15, "y": allState.snorlax.y + 10},
-        ];
-        
-        this.rotatePoint = function(pi) {
-            return {"x": Math.cos(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) - Math.sin(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.x, 
-                    "y": Math.sin(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) + Math.cos(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.y};
+        mouthP = [{
+            "x": allState.snorlax.x - 15,
+            "y": allState.snorlax.y + 10
+        }, {
+            "x": allState.snorlax.x - 15,
+            "y": allState.snorlax.y + 30
+        }, {
+            "x": allState.snorlax.x + 15,
+            "y": allState.snorlax.y + 30
+        }, {
+            "x": allState.snorlax.x + 15,
+            "y": allState.snorlax.y + 10
+        }, ];
+
+        this.rotatePoint = function (pi) {
+            return {
+                "x": Math.cos(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) - Math.sin(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.x,
+                "y": Math.sin(allState.snorlax.rotation) * (pi.x - allState.snorlax.x) + Math.cos(allState.snorlax.rotation) * (pi.y - allState.snorlax.y) + allState.snorlax.y
+            };
         };
         // Rotation of point (px, py) around point (ox, oy).
         // p'x = cos(theta) * (px-ox) - sin(theta) * (py-oy) + ox
         // p'y = sin(theta) * (px-ox) + cos(theta) * (py-oy) + oy
         mouthPTrans = mouthP.map(this.rotatePoint);
-        
+
         // Determinant of [(x0, y0, 1), 
         //                 (x1, y1, 1), 
         //                 (x2, y2, 1)]
@@ -802,29 +845,31 @@ function SnorlaxMunch() {
         function det(p0, p1, p2) {
             return (.5) * (p1.x * p2.y - p1.y * p2.x - p0.x * p2.y + p0.y * p2.x + p0.x * p1.y - p0.y * p1.x);
         }
-        
+
         function getSign(i) {
             return i < 0 ? -1 : 1;
         }
-        
+
         // p1, p2, p
-        p = {"x": this.x, "y": this.y};
+        p = {
+            "x": this.x,
+            "y": this.y
+        };
         detSigns = [
-            getSign(det(mouthPTrans[0], mouthPTrans[1], p)),
-            getSign(det(mouthPTrans[1], mouthPTrans[2], p)),
-            getSign(det(mouthPTrans[2], mouthPTrans[3], p)),
-            getSign(det(mouthPTrans[3], mouthPTrans[0], p)),
-        ];
-        
-        if(allState.snorlax.mouthOpen) {
-            if(detSigns[0] === detSigns[1] && detSigns[1] === detSigns[2] && detSigns[2] === detSigns[3]) {
+        getSign(det(mouthPTrans[0], mouthPTrans[1], p)),
+        getSign(det(mouthPTrans[1], mouthPTrans[2], p)),
+        getSign(det(mouthPTrans[2], mouthPTrans[3], p)),
+        getSign(det(mouthPTrans[3], mouthPTrans[0], p)), ];
+
+        if (allState.snorlax.mouthOpen) {
+            if (detSigns[0] === detSigns[1] && detSigns[1] === detSigns[2] && detSigns[2] === detSigns[3]) {
                 allState.gameState.score += gameSettings.pointsPerPokeballEaten;
                 return true;
             }
         } else {
-            if(dis <= rad) {
+            if (dis <= rad) {
                 allState.snorlax.health -= gameSettings.damagePerPokeballHit;
-                if(allState.snorlax.health < 0) {
+                if (allState.snorlax.health < 0) {
                     allState.snorlax.health = 0;
                 }
                 allState.snorlax.hit = true;
@@ -833,7 +878,7 @@ function SnorlaxMunch() {
         }
     }
 
-    function drawPaused() {   
+    function drawPaused() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = "bold 20px sans-serif";
@@ -842,13 +887,13 @@ function SnorlaxMunch() {
         ctx.fillStyle = "orange";
         ctx.fillText("Hit P to resume.", 500, 500);
     }
-    
+
     function checkLose() {
-        if(!allState.gameState.ended && allState.snorlax.health <= 0) {
-            allState.gameState.ended = 1;            
+        if (!allState.gameState.ended && allState.snorlax.health <= 0) {
+            allState.gameState.ended = 1;
         }
     }
-    
+
     function drawLose() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -862,7 +907,7 @@ function SnorlaxMunch() {
     }
 
     function checkWin() {
-        if(allState.gameState.level == 4 && allState.ballState.top.arr.length == 0 && allState.ballState.bottom.arr.length == 0 && allState.ballState.right.arr.length == 0 && allState.ballState.left.arr.length == 0) {
+        if (allState.gameState.level == 4 && allState.ballState.top.arr.length == 0 && allState.ballState.bottom.arr.length == 0 && allState.ballState.right.arr.length == 0 && allState.ballState.left.arr.length == 0) {
             allState.gameState.ended = 2;
         }
     }
@@ -879,7 +924,7 @@ function SnorlaxMunch() {
         ctx.fillText(allState.gameState.score, 500, 400);
         ctx.fillText("Hit R to restart", 500, 500);
     }
-    
+
     function clearCanvas() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -887,27 +932,29 @@ function SnorlaxMunch() {
     function redraw() {
         clearCanvas();
         drawBackground();
-        switch(allState.gameState.ended) {
-            case 0:
-                if(!allState.gameState.paused) {
-                    drawHud();
-                    drawSnorlax();
-                    if(gameStateLevel()) {
-                        generateBalls();
-                    }
-                    drawBalls(allState.ballState.top, allState.ballState.left, allState.ballState.right, allState.ballState.bottom, balls);
-                    checkLose();
-                    checkWin();
-                } else {
-                    drawPaused();
+        switch (allState.gameState.ended) {
+        case 0:
+            if (!allState.gameState.paused) {
+                drawHud();
+                drawSnorlax();
+                if (gameStateLevel()) {
+                    generateBalls();
                 }
-                break;
-            case 1: // lose
-                drawLose();
-                break;
-            case 2: // win
-                drawWin();
-                break;
+                drawBalls(allState.ballState.top, allState.ballState.left, allState.ballState.right, allState.ballState.bottom, balls);
+                checkLose();
+                checkWin();
+            } else {
+                drawPaused();
+            }
+            break;
+        case 1:
+            // lose
+            drawLose();
+            break;
+        case 2:
+            // win
+            drawWin();
+            break;
         }
     }
 
@@ -919,7 +966,7 @@ function SnorlaxMunch() {
         canvas.addEventListener('mousedown', onMouseDown, false);
         canvas.addEventListener('mouseup', onMouseUp, false);
     }
-    
+
     function removeEventListeners() {
         canvas.removeEventListener('keydown', onKeyDown);
         canvas.removeEventListener('keyup', onKeyUp);
@@ -932,10 +979,10 @@ function SnorlaxMunch() {
         initSleepToggler();
         initAwakeMeter();
         generateBalls(); // Create an array to store the balls info
-        
+
         redraw(); // Initial draw
-        allState.gameState.stInt = setInterval(redraw, 20);  // Redraw loop.
-        
+        allState.gameState.stInt = setInterval(redraw, 20); // Redraw loop.
+
         // Give focus to capture key inputs.
         canvas.setAttribute('tabindex', '0');
         canvas.focus();
@@ -975,6 +1022,7 @@ function SnorlaxMunch() {
         ctx.fillText("Without your help, Snorlax was captured.", 500, 300);
         ctx.fillText("Hope you're happy.", 500, 500);
     }
+
     function drawMenu() {
         clearCanvas();
         drawBackground();
@@ -991,22 +1039,22 @@ function SnorlaxMunch() {
         ctx.fillRect(390, 265, 220, 60);
         ctx.fillStyle = "lightgrey";
         ctx.fillText("Play!", 500, 300);
-        
+
         ctx.fillStyle = "black";
         ctx.fillRect(390, 365, 220, 60);
         ctx.fillStyle = "lightgrey";
         ctx.fillText("Controls", 500, 400);
-        
+
         ctx.fillStyle = "black";
         ctx.fillRect(390, 465, 220, 60);
         ctx.fillStyle = "lightgrey";
         ctx.fillText("Quit", 500, 500);
-        
+
         ctx.strokeStyle = "orange";
-        ctx.strokeRect(392,268 + (100 * allState.menuState.choice),215,55);
+        ctx.strokeRect(392, 268 + (100 * allState.menuState.choice), 215, 55);
     }
 
-    this.introMenu = function() {
+    this.introMenu = function () {
         addEventListeners();
         drawMenu();
         allState.menuState.menuId = setInterval(drawMenu, 20);
