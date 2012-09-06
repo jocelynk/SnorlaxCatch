@@ -24,6 +24,12 @@ var gameSettings = {
 /**
  * Global objects
  */
+ var menuState = {
+    choice: 0,
+    picked: false,
+    menuId: undefined,
+}
+ 
 var ballState = {
     radius: 10, // Radius of pokeball
     // Arrays for pokeballs
@@ -61,6 +67,10 @@ var keyControls = {
     "83": {type: "move", value: "down"}, // s
     "68": {type: "move", value: "right"}, // d
     "80": {type: "game", value: "pause"}, // p
+	"38": {type: "menu", value: "menuup"}, // Up Arrow
+	"40": {type: "menu", value: "menudown"}, // Down Arrow
+	"13": {type: "menu", value: "menuenter"}, // Enter
+	"27": {type: "menu", value: "menuesc"}, // Esc
 }
 
 /**
@@ -104,6 +114,9 @@ function handleKeyDown(input) {
         case "game":
             handleGameInput(input.value);
             break;
+        case "menu":
+            handleMenuInput(input.value);
+            break;
     }
 
 }
@@ -119,6 +132,45 @@ function handleGameInput(input) {
     switch(input) {
         case "pause":
             gameState.paused = !gameState.paused;
+            break;
+    }
+}
+
+function handleMenuInput(input) {
+    switch(input) {
+        case "menuup":
+            if(menuState.choice > 0 && menuState.picked === false)
+                menuState.choice--;
+            break;
+        case "menudown":
+            if(menuState.choice < 2 && menuState.picked === false)
+                menuState.choice++;
+            break;
+        case "menuenter":
+            if(menuState.picked === true) {
+                break;
+            }
+            clearInterval(menuState.menuId);
+            menuState.picked = true;
+            switch(menuState.choice) {
+                case 0:
+                    main();
+                    break;
+                case 1:
+                    menuState.menuId = setInterval(displayControls, 20);
+                    break;
+                case 2:
+                    displayQuit();
+                    break;
+            }
+            break;
+        case "menuesc":
+            if(menuState.picked === true && menuState.choice === 1)
+            {
+                clearInterval(menuState.menuId);
+                menuState.picked = false;
+                menuState.menuId = setInterval(drawMenu, 20);
+            }
             break;
     }
 }
@@ -778,7 +830,7 @@ function addEventListeners() {
 }
 
 function main() {
-    addEventListeners();
+    //addEventListeners();
     initSleepToggler();
     initAwakeMeter();
     generateBalls(); // Create an array to store the balls info
@@ -791,5 +843,76 @@ function main() {
     canvas.focus();
 }
 
-// Call main method
-main();
+function displayControls() {
+	clearCanvas();
+	drawBackground();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = "bold 100px sans-serif";
+	ctx.fillStyle = "indigo";
+	ctx.fillText("Snorlax Munch", 500, 100);
+	ctx.font = "bold 20px sans-serif";
+	ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+	ctx.fillRect(0, 0, 1000, 800);
+	ctx.fillStyle = "white";
+	ctx.fillText("Use WASD to Move, and the mouse to rotate.", 500, 300);
+	ctx.fillText("Click to open Snorlax's Mouth.", 500, 350);
+	ctx.fillText("Eat as many pokeballs as you can.", 500, 400);
+	ctx.fillText("But be careful, if you get hit anywhere but your mouth, you lose health.", 500, 450);
+	ctx.fillText("Now go show that trainer who is the boss.", 500, 500);
+	ctx.fillStyle = "orange";
+	ctx.fillText("Hit Esc to go back to the Menu.", 500, 550);	
+}
+
+function displayQuit() {
+	clearCanvas();
+	drawBackground();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = "bold 50px sans-serif";
+	ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+	ctx.fillRect(0, 0, 1000, 800);
+	ctx.fillStyle = "white";
+	ctx.fillText("Without your help, snorlax was captured.", 500, 300);
+	ctx.fillText("Think about this before you quit.", 500, 500);
+}
+function drawMenu() {
+	clearCanvas();
+	drawBackground();
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.font = "bold 100px sans-serif";
+	ctx.fillStyle = "indigo";
+	ctx.fillText("Snorlax Munch", 500, 100);
+	ctx.font = "bold 20px sans-serif";
+	ctx.fillStyle = "black";
+	ctx.fillText("Use UP/DOWN to Navigate and Enter to Pick.", 500, 220);
+	ctx.font = "bold 50px sans-serif";
+	ctx.fillStyle = "black";
+	ctx.fillRect(390, 265, 220, 60);
+	ctx.fillStyle = "lightgrey";
+	ctx.fillText("Play!", 500, 300);
+	
+	ctx.fillStyle = "black";
+	ctx.fillRect(390, 365, 220, 60);
+	ctx.fillStyle = "lightgrey";
+	ctx.fillText("Controls", 500, 400);
+	
+	ctx.fillStyle = "black";
+	ctx.fillRect(390, 465, 220, 60);
+	ctx.fillStyle = "lightgrey";
+	ctx.fillText("Quit", 500, 500);
+	
+	ctx.strokeStyle = "orange";
+	ctx.strokeRect(392,268 + (100 * menuState.choice),215,55);
+}
+
+function introMenu() {
+	addEventListeners();
+	drawMenu();
+	menuState.menuId = setInterval(drawMenu, 20);
+	canvas.setAttribute('tabindex', '0');
+    canvas.focus();
+}
+
+introMenu();
