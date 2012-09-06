@@ -621,6 +621,49 @@ function SnorlaxMunch() {
         this.ctx.stroke();
         this.ctx.closePath();
     }
+	
+	function GreatBall(x, y, radius, dx, dy, side, created) {
+		Ball.call(this, x, y, radius, dx, dy, side, created);
+		this.canvas = canvas;
+		this.ctx = canvas.getContext('2d');
+	}
+
+	GreatBall.prototype = new Ball();
+	GreatBall.prototype.constructor = GreatBall;
+
+	GreatBall.prototype.Create = function() {
+		this.ctx.beginPath();
+		this.ctx.fillStyle = "blue";
+		this.ctx.lineWidth = "2"
+		this.ctx.arc(this.x, this.y, this.radius, 0, 3 * Math.PI, true);
+		this.ctx.fill();
+		this.ctx.stroke();
+		this.ctx.closePath();
+
+		this.ctx.beginPath();
+		this.ctx.fillStyle = "white";
+		this.ctx.lineWidth = "2"
+		this.ctx.arc(this.x, this.y, this.radius, Math.PI, 0, true);
+		this.ctx.fill();
+		this.ctx.stroke();
+		this.ctx.closePath();
+
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.x, this.y);
+		this.ctx.lineTo(this.x - this.radius, this.y);
+		this.ctx.moveTo(this.x, this.y);
+		this.ctx.lineTo(this.x + this.radius, this.y);
+		this.ctx.stroke();
+		this.ctx.closePath();
+
+		this.ctx.beginPath();
+		this.ctx.fillStyle="black";
+		this.ctx.lineWidth="2"
+		this.ctx.arc(this.x,this.y,this.radius/6.25,0,Math.PI*4,true);
+		this.ctx.fill();
+		this.ctx.stroke();
+		this.ctx.closePath();
+	}
 
 
     function generateBalls() {
@@ -659,22 +702,16 @@ function SnorlaxMunch() {
                 case 1:
                     break;
                 case 2:
-                    ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-                    ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+                    ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
                     break;
                 case 3:
                     break;
                 case 4:
-                    ballState.right.arr.push(new Ball(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
-                    ballState.left.arr.push(new Ball(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
+                    ballState.right.arr.push(new GreatBall(canvas.width+11,h,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"right",false));
+                    ballState.left.arr.push(new GreatBall(-11,h+100,10,Math.floor(Math.random() * 5) + 1,Math.floor(Math.random() * 5) + 1,"left",false));
                     break;
             }
         }
-        
-        //ballState.top.push(new Ball(canvas.width/2,-11,10,3,3));
-        //ballState.right.push(new Ball(canvas.width+11,canvas.height/2,10,3,3));
-        //ballState.left.push(new Ball(-11,canvas.height/2,10,3,3));
-        //ballState.bottom.push(new Ball(canvas.width/2,canvas.height+11,10,3,3));
     }
 
     Ball.prototype.Bounce = function () {
