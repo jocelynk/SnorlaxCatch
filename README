@@ -1,0 +1,38 @@
+Snorlax Munch
+By:
+Tanay Gavankar (tgavanka)
+Jocelyn Kong (jocelynk)
+Sid Soundararajan (ssoundar)
+
+
+How to Play:
+You're Snorlax and a trainer is trying to catch you. You've been disturbed
+from your sleep and you're angry! 
+
+Use WASD to move, and use your cursor's position to rotate your head.
+Remember that your head will face in the opposite direction of your cursor.
+Click anywhere ingame to open your mouth and devour the pesky Pokeballs 
+that are flying around. Being Snorlax, you can only stay awake and keep 
+your mouth open as long as your PP bar isn't empty. Don't get hit when 
+you're asleep! Getting hit by Pokeballs while asleep will take some HP
+until you faint and get captured, and you must avoid that at all costs.
+The trainer intends on making you lose 800 lbs after capturing you,
+and you definitely don't want that to happen.
+
+Ideas from Week 1:
+* Canvas drawing
+    - All sprites are custom-drawn via Canvas commands
+    - Transformations are used to manipulated drawings
+* First-class functions
+    - Many code snippets are pulled into first-class functions
+      for reusability.
+* Object-oriented Design / Inheritance
+    - The Pokeballs are individual objects, and the GreatBalls
+      inherit from the pokeballs.
+* Event Listeners
+    - Uses keydown/keyup events for smooth keyboard movements
+    - Uses mousemove event for cursor positioning
+    - Uses mousedown event for clicks
+* Minimal clobbering of global scope
+    - The game itself is encapsulated in a SnorlaxMunch object,
+      so as to avoid binding/clobbering in the global scope.
