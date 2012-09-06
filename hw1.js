@@ -207,7 +207,9 @@ function SnorlaxMunch() {
             allState.gameState.paused = !allState.gameState.paused;
             break;
         case "restart":
-            resetGame();
+            if (allState.gameState.ended > 0) {
+                resetGame();
+            }
             break;
         }
     }
@@ -302,8 +304,15 @@ function SnorlaxMunch() {
     }
 
     function updateSnorlaxPosition() {
-        allState.snorlax.x += allState.snorlax.dx;
-        allState.snorlax.y += allState.snorlax.dy;
+        if (allState.snorlax.x + allState.snorlax.dx > allState.snorlax.radius &&
+            allState.snorlax.x + allState.snorlax.dx < canvas.width - allState.snorlax.radius) {
+            allState.snorlax.x += allState.snorlax.dx;
+        }
+
+        if (allState.snorlax.y + allState.snorlax.dy > allState.snorlax.radius &&
+            allState.snorlax.y + allState.snorlax.dy < canvas.height - allState.snorlax.radius) {
+            allState.snorlax.y += allState.snorlax.dy;
+        }
     }
 
     function drawSnorlax() {
